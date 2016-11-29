@@ -15,7 +15,7 @@ void init_seg() {
 	seg_arr[2].used = 0; 
 	seg_arr[2].address = 0x2000;
 	
-	seg_arr[3].used = 1; //stack
+	seg_arr[3].used = 0; //OLD stack
 	seg_arr[3].address = 0x3000;
 	
 	seg_arr[4].used = 0;

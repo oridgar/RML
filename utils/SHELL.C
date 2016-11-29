@@ -74,7 +74,15 @@ int shell() {
 		else if (strcmp(buf,"dispatch") != -1) {
 			dispatch();
 		}
+		else if (strcmp(buf,"shell") != -1) {
+			run_program("shell");
+		}
+		else if (strcmp(buf,"ls") != -1) {
+			run_program("ls");
+		}
 		else {
+			//TODO: call to run_program and get return code from the kernel
+			//by that to decide if to print the following message
 			printstr(buf);
 			printstr(": command not found");
 		}

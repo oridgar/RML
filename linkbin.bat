@@ -11,8 +11,8 @@ IF ERRORLEVEL 1 pause
 tasm  d:\arch\8088\kernel\dispatch.asm
 IF ERRORLEVEL 1 pause
 rem creating object file from C code
-tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c
-tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c
+tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c
+tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c
 
 IF ERRORLEVEL 1 pause
 tcc -Id:\include -mt -S d:\kernel\fdsptch.c d:\mm\mm.c
@@ -58,6 +58,12 @@ echo /////////////
 echo linking shell
 echo /////////////
 tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\shell.obj,shell.bin
+IF ERRORLEVEL 1 pause
+
+echo //////////
+echo linking ls
+echo //////////
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\ls.obj,ls.bin
 IF ERRORLEVEL 1 pause
 
 rem echo //////////////////

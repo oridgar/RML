@@ -18,5 +18,6 @@ all:
 	#@echo copying syscall dispatecher at sector offset $(SEEK)
 	#dd if=./obj/KERNEL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=$(SEEK) count=2
 	dd if=./obj/SHELL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=36 count=18
+	dd if=./obj/LS.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=54 count=18
 	#dd if=/dev/zero of=./obj/pad1.dat bs=438 count=1
 	#cat ./obj/boot.bin ./obj/HEAD.COM | dd of=./obj/disk1.img conv=notrunc

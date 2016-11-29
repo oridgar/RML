@@ -143,6 +143,14 @@ int load(char *name) {
 		head = 0x00;
 		sector = 0x01;
 	}
+	else if (strcmp(name,"ls") != -1) {
+		num_sectors = 0x12;
+		drive = 0x00;
+		cylinder = 0x01;
+		head = 0x01;
+		sector = 0x01;
+	}
+	//TODO: to be able to return another code that indicate that the program is not found!
 	
 	load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
 		
@@ -229,25 +237,19 @@ void set_ivt() {
 //calling load to load the program into memory
 //calling farcall to run the program
 void run_program(char *name) {
-	int segment;
+	unsigned int segment;
+	char seg_prefix;
 	printstr("loading ");
 	printstr(name);
 	printstr("...\r\n");
 	segment = load(name);
 
-	if (segment == 0x2000) {
-		printstr("loaded to 0x2000\r\n");
-	}
-	else if (segment == 0x3000) {
-		printstr("loaded to 0x3000\r\n");
-	}
-	else if (segment == 0x4000) {
-		printstr("loaded to 0x4000\r\n");
-	}
-	else if (segment == 0x5000) {
-		printstr("loaded to 0x5000\r\n");
-	}
+	printstr("loaded to 0x");
+	seg_prefix = '0' + (segment / 0x1000);
+	_putchar(seg_prefix);
+	printstr("000\r\n");
 	
+	//For now supporting only binary format. code origin is in 0x0000 or 0h
 	farcall(segment,0x0000);
 	/*asm {
 				db 9Ah // CALL FAR instruction
