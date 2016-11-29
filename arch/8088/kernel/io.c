@@ -1,12 +1,7 @@
+#include "io.h"
 #include "sysdef.h"
-#ifndef mystdio
 #include "mystdio.h"
-#define mystdio
-#endif
-#ifndef mystring
 #include "mystring.h"
-#define mystring
-#endif
 
 void syscall(int service);
 void _putchar(char in);
@@ -23,7 +18,7 @@ char dgetchar();
 void dprintstr(char *string) {
 	int i = 0;
 	
-	memcpy(string,sysparam.param,512);
+	memcpy(sysparam.param,string,512);
 	
 	while (sysparam.param[i] != 0) {
 		//dputchar(sysparam.param[i]);
@@ -104,25 +99,6 @@ void syscall(int service) {
 	}
 }
 
-void _printstr(char *string) {
-	memcpy(string,sysparam.param,512);
-	syscall(0x04);
-	//dprintstr(string);
-}
-
-void _putchar(char in) {
-	sysparam.param[0] = in;
-	syscall(0x05);
-	//dputchar(in);
-}
-
-
-char _getchar() {
-	syscall(0x06);
-	return sysparam.param[0];
-	//return dgetchar();
-}
-
 void call_int() {
 	syscall(0x00);
 }
@@ -135,14 +111,71 @@ void reboot() {
 	syscall(0x02);
 }
 
+void _printstr(char *string) {
+	memcpy(sysparam.param,string,512);
+	syscall(0x04);
+	//dprintstr(string);
+}
+
+void _putchar(char in) {
+	sysparam.param[0] = in;
+	syscall(0x05);
+	//dputchar(in);
+}
+
 void dispatch() {
 	syscall(0x05);
 }
 
-void run_program(char *string) {
-	memcpy(string,sysparam.param,512);
-	syscall(0x07);
+char _getchar() {
+	syscall(0x06);
+	return sysparam.param[0];
+	//return dgetchar();
 }
+
+int run_program(char *string) {
+	memcpy(sysparam.param,string,512);
+	syscall(0x07);
+	return sysparam.param[0];
+}
+
+
+//files
+
+/*
+int myopen(const char *pathname, int flags, unsigned int mode) {
+	memcpy(pathname,sysparam.param,256);
+	syscall(0x08);
+	return (int)sysparam.param;
+}
+
+int myclose(int fd) {
+	memcpy(&fd,sysparam.param,sizeof(fd));
+	syscall(0x09);
+	return (int)sysparam.param;
+}
+
+unsigned int myread(int fd, void *buf, unsigned int count) {
+	memcpy(fd,(&((SYSCALL_FILEIO)sysparam).fd),sizeof(fd));
+	memcpy(&count,&(((SYSCALL_FILEIO)sysparam).count),sizeof(count));
+	syscall(0x10);
+	memcpy(&sysparam,buf,512);
+	return 0;
+}
+
+unsigned int mywrite(int fd, const void *buf, unsigned int count) {
+	SYSCALL_FILEIO *params = (SYSCALL_FILEIO)sysparam;
+	memcpy(fd,&params->fd,sizeof(fd));
+	memcpy(count,&params->count,sizeof(count));
+	memcpy(buf,&params->buf,sizeof(params->buf));
+	syscall(0x11);
+	return sysparam;
+}
+
+unsigned int mylseek(int fildes, unsigned int offset, int whence) {
+	return 0;
+}
+*/
 
 /*
 fork();

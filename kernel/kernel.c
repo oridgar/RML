@@ -7,6 +7,10 @@
 #include "mystring.h"
 #define STRING
 #endif
+#include "fs/fs.h"
+#include "types.h"
+#include "bios.h"
+#include "linux/kernio.h"
 
 //KERNEL SERVICES - PUBLIC
 void reboot();
@@ -17,7 +21,7 @@ void run_program(char *name); //run program = load + call
 //void run_shell();
 
 //KERNEL SERVICES - PRIVATE
-int load(char *name); //loading program into memory
+unsigned int load(char *name); //loading program into memory
 extern void farcall(int seg,int ofs); //call the program
 
 //CPU RELATED
@@ -26,19 +30,30 @@ void sti();
 void set_ivt();
 
 //BIOS RELATED
-void clear_scr();
+//void clear_scr();
 void printstr(char *string);
 void _putchar(char in);
 char _getchar();
-void load_program(int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
+void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
 
-
+void printf(char *string) {
+	printstr(string);
+}
 
 void startk() {
+	//--------------------
+	//Variable Declaration
+	//--------------------
 	int i;
+
+    //------------
+    //Code Section
+    //------------
 	printstr("starting kernel...\r\n");
 	init_seg();
 	set_ivt();
+
+	mount("a");
 	//while (1) { run_init(); }
 	while (1) { run_program("init"); }
 }
@@ -120,44 +135,54 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 	return;
 }
 
-int load(char *name) {
-	int segment = get_free_seg();
+unsigned int load(char *name) {
+	unsigned int segment = get_free_seg();
 	int offset = 0x0000;
 	char num_sectors;
 	char cylinder;
 	char sector;
 	char head;
 	char drive;
+	Fat16Entry file_list[256];
+	Fat16Entry currfile;
 	
-	if (strcmp(name,"init") != -1) {
+	//replace it with get_file and get_file_content
+	if (strcmp(name,"init") == 0) {
 		num_sectors = 0x12;
 		drive = 0x00;
 		cylinder = 0x00;
 		head = 0x01;
 		sector = 0x01;
+		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
 	}
-	else if (strcmp(name,"shell") != -1) {
+	else if (strcmp(name,"shell") == 0) {
 		num_sectors = 0x12;
 		drive = 0x00;
 		cylinder = 0x01;
 		head = 0x00;
 		sector = 0x01;
+		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
 	}
-	else if (strcmp(name,"ls") != -1) {
-		num_sectors = 0x12;
-		drive = 0x00;
-		cylinder = 0x01;
-		head = 0x01;
-		sector = 0x01;
+	else if (strcmp(name,"ls") == 0) {
+		get_root_files(file_list);
+		if (get_file(file_list,"LS",&currfile) == -1) {
+			printk("could not find file!!!\r\n");
+		}
+		else {
+			load_file_content(&currfile,segment,offset);
+		}
+		//num_sectors = 0x12;
+		//drive = 0x00;
+		//cylinder = 0x01;
+		//head = 0x01;
+		//sector = 0x01;
 	}
 	//TODO: to be able to return another code that indicate that the program is not found!
 	
-	load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
-		
 	return segment;
 }
 
-void load_program(int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive) {
+void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive) {
 	asm {
 		mov  dl,[drive] //drive
 		mov	 ch,[cylinder] // cylinder/track 
@@ -251,37 +276,20 @@ void run_program(char *name) {
 	
 	//For now supporting only binary format. code origin is in 0x0000 or 0h
 	farcall(segment,0x0000);
-	/*asm {
-				db 9Ah // CALL FAR instruction
-			  //db  0eah //JMP FAR instruction 
-				dw  0 //offset
-				dw  2000h //segment TODO:get it by parameter and not hard coded!
-	}*/
-	
-	//macro example
-	/*
-	FARCALL macro seg, ofs 
-        db 9Ah  ; CALL FAR instruction 
-        dw ofs 
-        dw seg 
-	endm 
-        And then use 
-	FARCALL 0043h, 0130h 
-	*/
 
-	printstr("returned to kernel...\r\n");
-	if (segment == 0x2000) {
-		printstr("0x2000\r\n");
-	}
-	else if (segment == 0x3000) {
-		printstr("0x3000\r\n");
-	}
-	else if (segment == 0x4000) {
-		printstr("0x4000\r\n");
-	}
-	else if (segment == 0x5000) {
-		printstr("0x5000\r\n");
-	}
+//	printstr("returned to kernel...\r\n");
+//	if (segment == 0x2000) {
+//		printstr("0x2000\r\n");
+//	}
+//	else if (segment == 0x3000) {
+//		printstr("0x3000\r\n");
+//	}
+//	else if (segment == 0x4000) {
+//		printstr("0x4000\r\n");
+//	}
+//	else if (segment == 0x5000) {
+//		printstr("0x5000\r\n");
+//	}
 	release_seg(segment);
 		
 	return;

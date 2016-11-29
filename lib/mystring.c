@@ -1,4 +1,29 @@
 #include "mystring.h"
+#include "types.h"
+
+char *strcpy(char *dst, char *src) {
+	int i;
+	i = -1;
+	do {
+		i++;
+		dst[i] = src[i];
+	} while (src[i] != 0);
+	return dst;
+}
+char *strncpy(char *dst,char *src,unsigned int n) {
+	int i;
+	i = -1;
+	do {
+		i++;
+		dst[i] = src[i];
+	} while (src[i] != 0 && i < n);
+
+	i++;
+	while (i < n) {
+		dst[i] = 0;
+	}
+	return dst;
+}
 
 int strcmp(char *src,char *dst) {
 	//change return values and shell code associated with it!
@@ -9,7 +34,13 @@ int strcmp(char *src,char *dst) {
 		i++;
 	}
 	if (src[i] == dst[i]) {
-		ret=i;
+		ret=0;
+	}
+	else if (src[i] == 0) {
+		ret = -1;
+	}
+	else if (dst[i] == 0) {
+		ret = 1;
 	}
 	return ret;
 }
@@ -39,7 +70,7 @@ size_t strlen(char *string) {
 }
 
 
-void *memcpy(char *src, char *dst, int n) {
+void *memcpy(char *dst, char *src, int n) {
 	int i;
 	for(i=0; i < n ; i++) {
 		dst[i] = src[i];

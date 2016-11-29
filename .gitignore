@@ -4,3 +4,6 @@ test
 *.exe
 *.com
 *.bin
+.settings
+.cproject
+.project

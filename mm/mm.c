@@ -37,9 +37,9 @@ void init_seg() {
 	seg_arr[9].address = 0x9000;
 }
 
-int get_free_seg() {
+unsigned int get_free_seg() {
 	int i;
-	int seg;
+	unsigned int seg;
 	for (i=0; i < NUM_SEG; i++) {
 		if (seg_arr[i].used == 0) {
 			seg = seg_arr[i].address;
@@ -50,23 +50,23 @@ int get_free_seg() {
 	return seg;
 }
 
-int release_seg(int seg) {
+unsigned int release_seg(unsigned int seg) {
 	int i;
 	char num;
 	for (i=0; i < NUM_SEG; i++) {
 		
-		printstr("checking segment number ");
+		//printstr("checking segment number ");
 		num = '1' + i;
-		_putchar(num);
-		printstr("...");
+		//_putchar(num);
+		//printstr("...");
 		if (seg_arr[i].address == seg) {
 			//printstr("released!\r\n");
 			//printstr('0' + (char)i);
 			seg_arr[i].used = 0;
-			printstr("released!\r\n");
+			//printstr("released!\r\n");
 			break;
 		}
-		printstr("\r\n");
+		//printstr("\r\n");
 	}
 	return i;
 }

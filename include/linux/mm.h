@@ -1,11 +1,16 @@
+#ifndef _MM_H
+#define _MM_H
+
 #define NUM_SEG 10
 
-int get_free_seg();
+unsigned int get_free_seg();
 void init_seg();
-int release_seg(int seg);
+unsigned int release_seg(unsigned int seg);
 
 typedef struct 
 {
   char used;
-  int  address;
+  unsigned int  address;
 }MEM_SEG ;
+
+#endif

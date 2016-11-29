@@ -1,25 +1,3 @@
-Peripherals to manage:
-1. keyboard
-2. screen
-3. floppy
-
----------------
-file structure:
----------------
-
-arch - machine dependent code
-arch/8088/boot - boot loader code
-arch/8088/kernel - kernel assembly code
-arch/8088/mm - memory management low level
-include - user libraries header files
-lib - user libraries, both C standard library and linux system call wrappers
-init - init system, first user process
-utils - user space utilities such as minimized shell
-
------
-Code:
------
-
 boot
 ----
 1. write stage 1 boot loader in MBR - V
@@ -27,7 +5,7 @@ boot
 kernel
 ------
 1. create kernel program, with CPU initialization - V
-2. basic loader (executable files without header, just put in free segment). block mode reading.
+2. basic loader (executable files without header, just put in free segment). block mode reading. - V
 
 init
 ----
@@ -60,16 +38,7 @@ More fixes
 1. memory manager - build an array in the kernel to manage segments and load programs dynamically - V
 2. fix bug when returning from init to kernel, segment variable value is truncated. SOMETHING WRONG WITH THE STACK!!!
    it seems that the call far function doing something - V
-3. separate shell from init and load shell from init by system call.
-
-standard library
-----------------
-1. implement the most used functions of C standard library
-
-IO
---
-1. write assembly code to map between assembly low-level instructions to C language.
-1.1. includes cli,sti,in,out
+3. separate shell from init and load shell from init by system call. - V
 
 Next release (file system):
 -------------
@@ -77,129 +46,23 @@ Next release (file system):
 2. put init and shell in a filesystem instead reading from sectors directly.
 3. load init and shell from the filesystem.
 
-
 Next release (scheduler):
 -------------
 1. how to program PIC (IRQ0 to interrupt handler)
 2. how to program PIT (timer configurations)
 3. handler will be a part of the scheduler in assembly.
+4. a data structure to manage user spaces / applications
+5. before loading a program, register it to this data structure
+
+standard library
+----------------
+1. implement the most used functions of C standard library
 
 Next release:
 -------------
 1. memory management - malloc and free for user space.
 
----------
-registers
----------
-
-general purpose
----------------
-1.ax
-2.bx
-3.cx
-4.dx
-
-segment
--------
-5.cs - code segment. ip related to this.
-6.ds - data segment
-7.ss - stack segment
-8.es - extra segment. for your own use. useful when writing to other segments.
-
-strings and arrays
-------------------
-9.si - source index
-10.di - destination index
-
-stack
------
-11.bp - base pointer. indirect access to data in segments. useful for function params.
-12.sp - stack top address. related to ss
-
-special purpose
----------------
-13.ip
-
-flags register
---------------
-16 bit, from which 11 bits are used.
-cannot read directly. some instructions use the flags (such as conditional jumps).
-
-
-how function call works
------------------------
-each call creates "stack frame", in which you can find:
-1. the arguments from the caller (push is in reverse order to the parameter position. first parameter will be pushed last)
-2. return value (second push) - optional!!!
-3. caller address
-4. local variables
-
-the first instructions when entering function:
-push bp
-mov bp,sp
-
-bp(base pointer) will point to the beginning of the stack frame for the current function.
-to refer to sent arguments,we need to add numbers to bp (as the stack decreases and everything pushed before will be
-in higher addresses).
-to refer to local variables, we need to decrease numbers from bp.
-
-at the end of the function we will pop the base pointer
-
-
-
-memory map - segments:
-----------------------
-0000h - IVT, Boot loader 0 - 64K
-1000h - kernel code 64K - 128K
-2000h - init & shell 128K - 192K
-3000h - stack segment 192K - 256K
-4000h - empty 256K - 320K 
-5000h - empty 320K - 384K
-6000h - empty 384K - 448K
-7000h - empty 448K - 512K
-8000h - empty 512K - 576K
-9000h - empty 576K - 640K
-A000h -> F000h - BIOS and memory mapped hardware
-
-diskette map
-------------
-C0,H0,S1 - boot loader (volume boot record)
-C0,H0,S2 - extended boot loader
-C0,H0,S3 - shell code
-C0,H0,S4 - shell code
-C0,H0,S5 - syscall dispatcher
-
-boot stages
------------
-boot.asm -> dispatch.asm (+fdsptch.c) -> head.asm -> init.c -> shell.c -> stdio.c -> io.c
-
-
-filesystem FAT
---------------
-fat_filelib.c - the main API file
-example.c - example + mapping to block level API
-fat_access.c - low level of block mode commands
-fat_cache.c
-fat_format.c - format disk with the filesystem structure
-fat_misc - 
-fat_string.c - string operations on file name and extension. this is higher level.
-fat_table.c - read the FAT metadata from the filesystem (the main table which manages clusters)
-fat_write.c - for adding new clusters to file and new files to directories
-
-
-call stack for filesystem
--------------------------
-example.c -> fat_filelib.c -> fat_access.c -> (example.c) -> io.c -> dispatch.asm / dispatch.c -> kernel.c -> BIOS / drivers
-                           -> fat_table.c
-			   -> fat_write.c
-			   -> fat_misc.c
-			   -> fat_string.c
-			   -> fat_filelib.c
-			   -> fat_cache.c
-
-dependent on stdlib.h and string.h
-
-
-standard library mapping
-------------------------
-stdio.c -> io.c -> dispatch.asm / dispatch.c -> kernel.c -> BIOS / drivers
+IO
+--
+1. write assembly code to map between assembly low-level instructions to C language.
+1.1. includes cli,sti,in,out

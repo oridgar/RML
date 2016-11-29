@@ -77,6 +77,9 @@ int shell() {
 		else if (strcmp(buf,"shell") != -1) {
 			run_program("shell");
 		}
+		else if (strcmp(buf,"init") != -1) {
+			run_program("init");
+		}
 		else if (strcmp(buf,"ls") != -1) {
 			run_program("ls");
 		}

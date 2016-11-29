@@ -1,0 +1,61 @@
+---------
+registers
+---------
+
+general purpose
+---------------
+1.ax
+2.bx
+3.cx
+4.dx
+
+segment
+-------
+5.cs - code segment. ip related to this.
+6.ds - data segment
+7.ss - stack segment
+8.es - extra segment. for your own use. useful when writing to other segments.
+
+strings and arrays
+------------------
+9.si - source index
+10.di - destination index
+
+stack
+-----
+11.bp - base pointer. indirect access to data in segments. useful for function params.
+12.sp - stack top address. related to ss
+
+special purpose
+---------------
+13.ip
+
+flags register
+--------------
+16 bit, from which 11 bits are used.
+cannot read directly. some instructions use the flags (such as conditional jumps).
+
+
+how function call works
+-----------------------
+each call creates "stack frame", in which you can find:
+1. the arguments from the caller (push is in reverse order to the parameter position. first parameter will be pushed last)
+2. return value (second push) - optional!!!
+3. caller address
+4. local variables
+
+the first instructions when entering function:
+push bp
+mov bp,sp
+
+bp(base pointer) will point to the beginning of the stack frame for the current function.
+to refer to sent arguments,we need to add numbers to bp (as the stack decreases and everything pushed before will be
+in higher addresses).
+to refer to local variables, we need to decrease numbers from bp.
+
+at the end of the function we will pop the base pointer
+
+
+create FAT12 on floppy image
+----------------------------
+mkfs.fat -n TEST1 -s 8 -S 512 -f 1 -F 12 ./fat.img

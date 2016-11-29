@@ -1,7 +1,8 @@
-#ifndef stddef
-#include "stddef.h"
-#define stddef
-#endif
+#ifndef _STDIO_H
+#define _STDIO_H
+
+#include "types.h"
+
 //my simple functions
 char getchar();
 void mputchar(char in);
@@ -60,3 +61,5 @@ int ungetc(int c, FILE *stream);
 //size_t fread(void *ptr, size_t size, size_t nobj, FILE *stream);
 //size_t fwrite(const void *ptr, size_t size, size_t nobj, FILE *stream);
 int    fseek(FILE *stream, long offset, int origin);
+
+#endif

@@ -84,7 +84,7 @@ loadsh:     jmp loddsp
 
 ;loading kernel to memory
 loddsp:		mov  ah,0x02 ; Read Sectors From Drive service
-			mov  al,0x08 ; number of sectors
+			mov  al,0x10 ; number of sectors
 			mov  cl,0x03 ; starting from sector
 			;mov  bx,0x100 ;  COM entry point
 			mov  bx,0x0 ;  entry point
