@@ -55,7 +55,7 @@ int unregister_proc(int pid) {
 
 int get_process_list() {
 	int i;
-	printk("pid ppid cs name\r\n");
+	printk("pid ppid cs name status\r\n");
 	for(i=0; i < NUM_PROCESSES; i++) {
 		if(processes[i].pid != 0) {
 			printk(myitoa(processes[i].pid));
@@ -65,6 +65,20 @@ int get_process_list() {
 			printk(myitoa(processes[i].cs));
 			printk(" ");
 			printk(processes[i].name);
+			printk(" ");
+			switch (processes[i].state) {
+			case READY:
+				printk("READY");
+				break;
+			case WAIT:
+				printk("WAIT");
+				break;
+			case RUNNING:
+				printk("RUNNING");
+				break;
+			default:
+				printk("UNKNOWN");
+			}
 			printk("\r\n");
 		}
 	}

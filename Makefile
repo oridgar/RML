@@ -13,11 +13,12 @@ all:
 	#seek + 1 = sector !!!!
 	dd if=./obj/KERNEL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=2 count=16
 	@echo copying shell code
-	#dd if=./obj/HEAD.COM of=./obj/disk1.img conv=notrunc bs=512 seek=2
-	dd if=./obj/INIT.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=18 count=18
-	#@echo copying syscall dispatecher at sector offset $(SEEK)
-	#dd if=./obj/KERNEL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=$(SEEK) count=2
-	dd if=./obj/SHELL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=36 count=18
-	dd if=./obj/LS.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=54 count=18
-	#dd if=/dev/zero of=./obj/pad1.dat bs=438 count=1
-	#cat ./obj/boot.bin ./obj/HEAD.COM | dd of=./obj/disk1.img conv=notrunc
+	#dd if=./obj/INIT.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=18 count=18
+	#dd if=./obj/SHELL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=36 count=18
+	#dd if=./obj/LS.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=54 count=18
+	mkfs.fat -n TEST1 -s 8 -S 512 -f 1 -F 12 ./obj/fat.img
+	mount ./obj/fat.img /mnt
+	cp ./obj/LS.BIN /mnt/LS.BIN
+	cp ./obj/INIT.BIN /mnt/INIT.BIN
+	cp ./obj/SHELL.BIN /mnt/SHELL.BIN
+	umount /mnt

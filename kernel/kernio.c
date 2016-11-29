@@ -202,7 +202,7 @@ int mount(char * filename) {
 //    printk("printing file list\r\n");
     //printing results
     //----------------
-    list_files(file_list);
+    //list_files(file_list);
 
 //    printk("\r\n");
 
@@ -230,7 +230,7 @@ int mount(char * filename) {
     	print_file(&currfile);
     }
     else {
-    	printk("file not found");
+    	//printk("file not found");
     }
 	//fclose(drv);
 

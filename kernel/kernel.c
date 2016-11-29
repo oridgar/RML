@@ -158,6 +158,9 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 		case 8:
 			get_process_list();
 			break;
+		case 9:
+			list_root_files();
+			break;
 		default:
 			break;
 	}
@@ -177,20 +180,36 @@ unsigned int load(char *name,int *pid) {
 	
 	//replace it with get_file and get_file_content
 	if (strcmp(name,"init") == 0) {
-		num_sectors = 0x12;
-		drive = 0x00;
-		cylinder = 0x00;
-		head = 0x01;
-		sector = 0x01;
-		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
+		get_root_files(file_list);
+		if (get_file(file_list,"INIT",&currfile) == -1) {
+			printk("could not find file!!!\r\n");
+		}
+		else {
+			load_file_content(&currfile,segment,offset);
+		}
+
+//		num_sectors = 0x12;
+//		drive = 0x00;
+//		cylinder = 0x00;
+//		head = 0x01;
+//		sector = 0x01;
+//		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
 	}
 	else if (strcmp(name,"shell") == 0) {
-		num_sectors = 0x12;
-		drive = 0x00;
-		cylinder = 0x01;
-		head = 0x00;
-		sector = 0x01;
-		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
+		get_root_files(file_list);
+		if (get_file(file_list,"SHELL",&currfile) == -1) {
+			printk("could not find file!!!\r\n");
+		}
+		else {
+			load_file_content(&currfile,segment,offset);
+		}
+
+//		num_sectors = 0x12;
+//		drive = 0x00;
+//		cylinder = 0x01;
+//		head = 0x00;
+//		sector = 0x01;
+//		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
 	}
 	else if (strcmp(name,"ls") == 0) {
 		get_root_files(file_list);
@@ -296,20 +315,20 @@ void run_program(char *name) {
 	char seg_prefix;
 	int pid;
 
-	printstr("loading ");
-	printstr(name);
-	printstr("...\r\n");
+	//printstr("loading ");
+	//printstr(name);
+	//printstr("...\r\n");
 	segment = load(name,&pid);
 
-	printstr("loaded to 0x");
+	//printstr("loaded to 0x");
 	seg_prefix = '0' + (segment / 0x1000);
-	_putchar(seg_prefix);
-	printstr("000");
-	printk(" pid: ");
-	printk(myitoa(pid));
-	printk(" ppid: ");
-	printk(myitoa(get_running_proc()));
-	printk("\r\n");
+	//_putchar(seg_prefix);
+//	printstr("000");
+//	printk(" pid: ");
+//	printk(myitoa(pid));
+//	printk(" ppid: ");
+//	printk(myitoa(get_running_proc()));
+//	printk("\r\n");
 	
 
 	//For now supporting only binary format. code origin is in 0x0000 or 0h

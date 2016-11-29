@@ -26,14 +26,14 @@ start:
 			
 
 ;printing message			
-prt:		mov  si, offset msg
-			mov  ah, 0eh
-chr:		lodsb
-			or   al,al
-			;jz   ivt
-			jz   init
-			int  10h   ; call BIOS service to print next character
-			jmp  chr
+;prt:		mov  si, offset msg
+;			mov  ah, 0eh
+;chr:		lodsb
+;			or   al,al
+;			;jz   ivt
+;			jz   init
+;			int  10h   ; call BIOS service to print next character
+;			jmp  chr
 
 ;start init program
 init:	    call near ptr _main
@@ -52,6 +52,6 @@ init:	    call near ptr _main
 			db 0cbh ; RETF code
 
 extrn	_main:near
-msg		db	'program entry point...',13,10,0
+;msg		db	'program entry point...',13,10,0
 userss  dw  0
 END start

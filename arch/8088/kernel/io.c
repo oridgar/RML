@@ -143,6 +143,10 @@ void get_process_list() {
 	syscall(0x08);
 }
 
+void list_root_files() {
+	syscall(0x09);
+}
+
 
 //files
 

@@ -9,8 +9,10 @@ void main() {
 		mputchar(str1[i]);
 		i++;
 	} */
-	printstr(str1);
-	printstr(str2);
+
+	list_root_files();
+	//printstr(str1);
+	//printstr(str2);
 	printstr("\r\n");
 	//return 0;
 }

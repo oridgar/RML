@@ -152,22 +152,34 @@ int get_root_files(Fat16Entry *files) {
 	return 0;
 }
 
+int list_root_files() {
+	Fat16Entry file_list[256];
+	get_root_files(file_list);
+	list_files(file_list);
+	return 0;
+}
+
 
 
 int list_files(Fat16Entry *files) {
 	int i;
 	fileAttrib attrib;
+	char name[9];
+	char ext[4];
 
 	for(i=0; i < bs.root_dir_entries;i++) {
 		if (get_entry_type(&files[i]) == TYPE_FILE) {
 			//printf("\nentry file #%d: ",i + 1);
-			printk("\r\nentry file #xxx: ");
+			//printk("\r\nentry file #xxx: ");
 			//deleted file
 			if (files[i].filename[0] == 0xe5) {
 				//printf("deleted (%s)\n",files[i].filename);
 				printk("deleted (");
-				printk(files[i].filename);
-				printk(")\r\n");
+				extract_file_name(&files[i],name,ext);
+				printk(name);
+				printk(".");
+				printk(ext);
+				printk(")   ");
 				continue;
 			}
 			//no file
@@ -177,13 +189,17 @@ int list_files(Fat16Entry *files) {
 			}
 			else {
 				//printf("%s\n",files[i].filename);
-				printk(files[i].filename);
-				printk("\r\n");
+				extract_file_name(&files[i],name,ext);
+				printk(name);
+				printk(".");
+				printk(ext);
+				printk("   ");
 			}
 			file_attrib(&files[i],&attrib);
 			//print_file_attrib(&files[i],&attrib);
 		}
 	}
+	printk("\r\n");
 	return 0;
 }
 
