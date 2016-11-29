@@ -12,6 +12,15 @@
 #include "bios.h"
 #include "linux/kernio.h"
 
+//PIC
+#define PIC1	0x20
+#define PIC2	0xA0
+#define PIC1_COMMAND	PIC1
+#define PIC1_DATA	(PIC1+1)
+#define PIC2_COMMAND	PIC2
+#define PIC2_DATA	(PIC2+1)
+#define PIC_EOI	0x20
+
 //KERNEL SERVICES - PUBLIC
 void reboot();
 void halt();
@@ -22,7 +31,12 @@ void run_program(char *name); //run program = load + call
 
 //KERNEL SERVICES - PRIVATE
 unsigned int load(char *name); //loading program into memory
+void outb(int port, char value);
+void set_scheduler();
 extern void farcall(int seg,int ofs); //call the program
+
+extern int b_int8_seg;
+extern int b_int8_offs;
 
 //CPU RELATED
 void cli();
@@ -35,6 +49,7 @@ void printstr(char *string);
 void _putchar(char in);
 char _getchar();
 void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
+void save_oldint8();
 
 void printf(char *string) {
 	printstr(string);
@@ -52,8 +67,11 @@ void startk() {
 	printstr("starting kernel...\r\n");
 	init_seg();
 	set_ivt();
+	set_scheduler();
+	//sti();
 
 	mount("a");
+	sti();
 	//while (1) { run_init(); }
 	while (1) { run_program("init"); }
 }
@@ -305,4 +323,103 @@ void sti() {
 	asm {
 		sti
 	}	
+}
+
+void outb(int port, char value) {
+	asm {
+		push ax
+		push dx
+		mov dx,[port]
+		mov al,[value]
+		out dx,al
+		pop dx
+		pop ax
+	}
+}
+
+void set_scheduler() {
+	save_oldint8();
+
+
+	//setting rml to be ISR for INT 08h
+
+	asm {
+			//first segment, where IVT is found
+			push ax
+			push es
+			push bx
+			mov ax,0h
+			mov es,ax
+
+			//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
+			//08h * 04h = 20h
+			mov bx,20h
+			//offset where ISR is found (6h)
+			mov ax,5h
+			mov es:[bx],ax
+
+			//at the next two bytes (22h) resides the segment for the interupt handler
+			//segment where ISR is found (1000h - second segment)
+			mov bx,22h
+			mov ax,1000h
+			mov es:[bx],ax
+			pop bx
+			pop es
+			pop ax
+	}
+
+
+	//update
+	//outb(0x20,0x00);
+
+	//end of interrupt
+	//outb(0x20,0x20);
+}
+
+void PIC_sendEOI(unsigned char irq) {
+	if(irq >= 8)
+		outb(PIC2_COMMAND,PIC_EOI);
+
+	outb(PIC1_COMMAND,PIC_EOI);
+}
+
+void save_oldint8() {
+	unsigned int offs;
+	unsigned int segment;
+
+	asm {
+
+		push ax
+		push es
+		push bx
+
+		//first segment, where IVT is found
+		mov ax,0h
+		mov es,ax
+
+		//offset where ISR is found (20h)
+		//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
+		//08h * 04h = 20h
+		//at the next two bytes (22h) resides the segment for the interupt handler
+
+		// offset
+		mov bx,20h
+		mov ax,es:[bx]
+		mov [offs],ax
+		//segment
+		add bx,2
+		mov ax,es:[bx]
+		mov [segment],ax
+
+		pop bx
+		pop es
+		pop ax
+	}
+
+	b_int8_offs = offs;
+	b_int8_seg = segment;
+	//printk("offset:");
+	//printk(myitoa(offs));
+	//printk("segment:");
+	//printk(myitoa(segment));
 }

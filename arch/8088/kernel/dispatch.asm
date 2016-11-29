@@ -6,10 +6,12 @@ global _farcall
 
 ; INT 80h start points
 start: 		
-			cli ; disable hardware interrupts while in system call
+			;cli ; disable hardware interrupts while in system call
 			jmp intr	;if jumps to address 0h - entry point for syscall
+			jmp kernel  ;if jumps to address 3h - entry point for kernel.
+			jmp sched
 			
-			;if jumps to address 3h - entry point for kernel.
+
 kernel: 	mov ax, cs ;initialize stack : SS=CS
 			mov ss,ax
 			mov ax, 0FFFEh
@@ -160,6 +162,38 @@ sysexit:	;HERE SHOULD BE THE CODE TO BRING BACK USER SPACE!
 			sti ; enable hardware interrupts
 			iret
 
+sched:
+			push ax
+			push bx
+			push ds
+			mov ax,cs
+			mov ds,ax
+			mov bx, offset _b_int8_offs
+			mov ax, [bx]
+			mov jmpf_ofs, ax
+			mov bx, offset _b_int8_seg
+			mov ax,[bx]
+			mov jmpf_segm, ax
+
+			;user code
+			;mov ax,61
+			;push ax
+			;call __putchar
+			;pop ax
+			call _schedule
+
+			pop ds
+			pop bx
+			pop ax
+			;far jmp to bios int 8
+			;public _b_int8_seg
+			;public _b_int8_offs
+			db 0EAh ; JUMP FAR instruction
+			jmpf_ofs  dw 0
+    		jmpf_segm dw 0h
+
+
+
 			
 ;the caller first pushes the offset and then the segment!
 ;stack content: offset, segment, caller offset to the next instruction, caller base pointer
@@ -237,7 +271,10 @@ _farcall:
 	pop bp
 	RET
 ;_farcall ENDP
-			
+
+public _b_int8_seg
+public _b_int8_offs
+
 ;msg		db	13,10,'system call!',13,10,0
 params		db 512 DUP(0)
 service		dw 0
@@ -247,6 +284,8 @@ spuser		dw 10 DUP(0)
 ssuser		dw 10 DUP(0)
 suserp      dw 0
 dsuser		dw 0
+_b_int8_seg	dw ?
+_b_int8_offs	dw ?
 
 extrn	__getchar:near
 extrn	__putchar:near
@@ -254,4 +293,6 @@ extrn	__dispatch:near
 extrn	_halt:near
 extrn	_reboot:near
 extrn	_startk:near
+extrn   _schedule:near
+
 END start

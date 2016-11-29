@@ -16,8 +16,8 @@ tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\a
 tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c >> result.txt 
 
 IF ERRORLEVEL 1 pause
-tcc -Id:\include -mt -S d:\kernel\kernel.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c
-tcc -Id:\include -mt -c d:\kernel\kernel.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c >> result.txt 
+tcc -Id:\include -mt -S d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c
+tcc -Id:\include -mt -c d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c >> result.txt 
 IF ERRORLEVEL 1 pause
 rem FILE SYSTEM
 rem ------------------------------------
@@ -53,7 +53,7 @@ rem note that /t is tiny - no executable header but binary format. /s is for cre
 rem at the end there is comma and after that the name of the output file. THIS IS IMPORTANT AS WITHOUT THIS FORMAT THE LINKER WILL SHOUT ON THE FACT THAT
 rem THE CODE IS NOT STARTED AT ORIGIN 100h.
 rem also dispatch.obj must be first as it is an assembly code with entry point and the linker demands that the first file will includes entry point
-tlink /t /s dispatch.obj kernel.obj mm.obj mystring.obj fs.obj bios.obj kernio.obj,kernel.bin >> result.txt 
+tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj mystring.obj fs.obj bios.obj kernio.obj,kernel.bin >> result.txt 
 IF ERRORLEVEL 1 pause
 
 echo ////////////
