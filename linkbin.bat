@@ -11,9 +11,13 @@ pause
 tasm  d:\arch\8088\kernel\dispatch.asm
 pause
 rem creating object file from C code
+tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c
 tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c
+
 pause
+tcc -Id:\include -mt -S d:\kernel\fdsptch.c d:\mm\mm.c
 tcc -Id:\include -mt -c d:\kernel\fdsptch.c d:\mm\mm.c
+
 pause
 rem ------------------------------------
 rem tcc -Id:\include -mt -c d:\fs\msdos\example.c 
@@ -35,8 +39,29 @@ rem pause
 rem tcc -Id:\include -mt -c d:\fs\msdos\write.c
 rem -------------------------------------------
 rem creating COM file for user space
-tlink /t /x d:\obj\head.obj d:\obj\shell.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\io.obj d:\obj\init.obj,shell.bin
-pause
+
 rem creating COM file for kernel space
 rem tlink /t dispatch.obj access.obj cache.obj filelib.obj format.obj misc.obj string.obj table.obj write.obj mystdio.obj mystring.obj
-tlink /t /x dispatch.obj fdsptch.obj mm.obj,kernel.bin
+echo //////////////
+echo linking kernel
+echo //////////////
+tlink /t /s dispatch.obj fdsptch.obj mm.obj mystring.obj,kernel.bin
+pause
+
+echo ////////////
+echo linking init
+echo ////////////
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\init.obj,init.bin
+pause
+
+echo /////////////
+echo linking shell
+echo /////////////
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\shell.obj,shell.bin
+pause
+
+rem echo //////////////////
+rem echo linking shell+init
+rem echo //////////////////
+rem tlink /t /x d:\obj\head.obj d:\obj\shell.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\io.obj d:\obj\init.obj,shell.bin
+rem pause

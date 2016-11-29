@@ -1,7 +1,12 @@
+//TEMP
+#include "sysdef.h"
+//END TEMP
 #ifndef mystdio
 #include "mystdio.h"
 #define mystdio
 #endif
+
+void dputchar(char in);
 
 //typedef unsigned long size_t;
 

@@ -9,31 +9,117 @@
 #endif
 
 void syscall(int service);
+void _putchar(char in);
+
 
 SYSCALL_PARAM sysparam;
 
+//TEMP REGION
+void dprintstr(char *string);
+void dputchar(char in);
+char dgetchar();
+
+
+void dprintstr(char *string) {
+	int i = 0;
+	
+	memcpy(string,sysparam.param,512);
+	
+	while (sysparam.param[i] != 0) {
+		//dputchar(sysparam.param[i]);
+		_putchar(sysparam.param[i]);
+		i++;
+	}
+}
+
+void dputchar(char in) {
+	char temp = in;
+	asm {
+		  mov ah,0Eh
+		  mov al,[temp]
+		  int 10h
+	}
+}
+
+
+char dgetchar() {
+	char temp;
+	
+	waitForKey:
+	asm {
+		mov ah,01h
+		int 16h
+		jnz gotKey
+		jmp waitForKey
+	}
+
+	gotKey:
+	asm {
+		mov ah,00h
+		int 16h
+		mov [temp],al
+	}
+	
+	return temp;
+}
+
+//END TEMP REGION
+
+
 void syscall(int service) {
 	asm {
+		//not needed as code and stack are taken care
+		//push cs
+		//push ip
+		//push ss
+		//push sp
+		
+
+		//push bp already happen by c compiler		
+		pushf
+		push ds
+		push es
+		push ax
+		push cx
+		push di
+		
+		push bx
+		push dx
+		push si
+		
 		mov bx,[service] //copying the value sitting in "service" address (pass by value)
 		mov dx,bx //copying the content of bx
 		mov si,offset sysparam;
 		int 80h
+		pop si
+		pop dx
+		pop bx
+		
+		pop di
+		pop cx
+		pop ax
+		pop es
+		pop ds
+		popf
 	}
 }
 
 void _printstr(char *string) {
 	memcpy(string,sysparam.param,512);
 	syscall(0x04);
+	//dprintstr(string);
 }
 
 void _putchar(char in) {
 	sysparam.param[0] = in;
 	syscall(0x05);
+	//dputchar(in);
 }
 
 char _getchar() {
-	syscall(0x06);
-	return sysparam.param[0];
+	//syscall(0x06);
+	//return sysparam.param[0];
+	return dgetchar();
 }
 
 void call_int() {
@@ -72,6 +158,15 @@ void dispatch() {
 	}
 	*/
 	syscall(0x05);
+}
+
+void run_shell() {
+	/*asm {
+		mov al,05h
+		int 80h
+	}
+	*/
+	syscall(0x07);
 }
 
 /*

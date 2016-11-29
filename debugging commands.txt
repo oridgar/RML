@@ -1,0 +1,16 @@
+reg
+sreg
+x /1bx 0x3000:0xfffe - top of stack
+x /1bx 0x3000:0xff4c - bp
+x /1bx 0x3000:0xff16 - sp / buf[0]
+
+0x02cd - mov ss:[bp+si-54],al (buf[i] = in)
+0x03d5 - (printstr(buf))
+0x0056 - (memcpy(string,sysparam.param,512)
+0x023d - (dst[i] = src[i]) : al-src[i] 
+
+
+context switch call stack
+-------------------------
+
+loader:

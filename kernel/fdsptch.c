@@ -3,6 +3,10 @@
 #include "linux/mm.h"
 #define MM
 #endif
+#ifndef STRING
+#include "mystring.h"
+#define STRING
+#endif
 
 int xload(char *name);
 void reboot();
@@ -11,6 +15,8 @@ void uname();
 void set_ivt();
 void clear_scr();
 void run_init();
+void run_shell();
+void run_program(char *name);
 void printstr(char *string);
 void _putchar(char in);
 char _getchar();
@@ -88,6 +94,9 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 		case 6:
 			params->param[0] = _getchar();
 			break;
+		case 7:
+			run_shell();
+			break;
 		default:
 			break;
 	}
@@ -113,12 +122,27 @@ int xload(char *name) {
 	//int segment = 0x2000;
 	int segment = get_free_seg();
 	int offset = 0x0000;
-	char num_sectors = 0x03;
-	char cylinder = 0x00;
-	char sector = 0x03;
-	char head = 0x00;
-	char drive = 0x00;
-
+	char num_sectors;
+	char cylinder;
+	char sector;
+	char head;
+	char drive;
+	
+	if (strcmp(name,"init") != -1) {
+		num_sectors = 0x12;
+		drive = 0x00;
+		cylinder = 0x00;
+		head = 0x01;
+		sector = 0x01;
+	}
+	else if (strcmp(name,"shell") != -1) {
+		num_sectors = 0x12;
+		drive = 0x00;
+		cylinder = 0x01;
+		head = 0x00;
+		sector = 0x01;
+	}
+	
 	//TODO: change to checking name param and decide by it what to load.
 	//if(1) {
 		//hard coded position of init program compiled with shell
@@ -212,12 +236,20 @@ void set_ivt() {
 	*/
 }
 
-
-
 void run_init() {
+	run_program("init");
+}
+
+void run_shell() {
+	run_program("shell");
+}
+
+void run_program(char *name) {
 	int segment;
-	printstr("loading init...\r\n");
-	segment = xload("init");
+	printstr("loading ");
+	printstr(name);
+	printstr("...\r\n");
+	segment = xload(name);
 
 	if (segment == 0x2000) {
 		printstr("loaded to 0x2000\r\n");
@@ -233,8 +265,6 @@ void run_init() {
 	}
 	
 	farcall(segment,0x0000);
-
-
 	/*asm {
 				db 9Ah // CALL FAR instruction
 			  //db  0eah //JMP FAR instruction 

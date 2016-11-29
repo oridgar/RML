@@ -4,3 +4,4 @@ boot: a
 log: e:\bochsout.txt
 mouse: enabled=0
 display_library: win32
+debug_symbols: file=bochs_debug.sym

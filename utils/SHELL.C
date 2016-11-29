@@ -2,9 +2,15 @@
 #include "mystring.h"
 #include "linux\io.h"
 
+void main() {
+	shell();
+	//return 0;
+}
+
 int shell() {
 	char *a = "# ";
-	char *buf = "                                                                                                               ";
+	//char *buf = "                                                                                                               ";
+	char buf[50];
 	char in;
 	int i;
 	int j;

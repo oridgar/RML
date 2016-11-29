@@ -4,6 +4,14 @@
 ORG 0h
 
 start: 		
+			;mov [userss],cs
+			;mov ss,[userss]
+			;mov sp,0FFFEh
+			
+			;starting new stack frame
+			push bp
+			mov  bp,sp
+			
 			push ax
 			push bx
 			push cx
@@ -12,8 +20,10 @@ start:
 			push ds ; saving data segment
 			push si
 			push di
+			
 			mov ax, cs ; saving code segment
 			mov ds,ax ; copying code segment to data segment
+			
 
 ;printing message			
 prt:		mov  si, offset msg
@@ -26,8 +36,9 @@ chr:		lodsb
 			jmp  chr
 
 ;start init program
-init:	    call _init
+init:	    call near ptr _main
 ;return to kernel
+						
 			pop di
 			pop si
 			pop ds
@@ -36,9 +47,11 @@ init:	    call _init
 			pop cx
 			pop bx
 			pop ax
+			pop bp
 			;retf ; return far to the kernel segment
 			db 0cbh ; RETF code
 
-extrn	_init:near
-msg		db	'starting init...',13,10,0
+extrn	_main:near
+msg		db	'program entry point...',13,10,0
+userss  dw  0
 END start
