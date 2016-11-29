@@ -1,83 +1,19 @@
 #include "sysdef.h"
-#ifndef MM
 #include "linux/mm.h"
-#define MM
-#endif
-#ifndef STRING
 #include "mystring.h"
-#define STRING
-#endif
 #include "fs/fs.h"
 #include "types.h"
 #include "bios.h"
 #include "linux/kernio.h"
 #include "linux/sched.h"
+#include "linux/kernel.h"
 
-//PIC
-#define PIC1	0x20
-#define PIC2	0xA0
-#define PIC1_COMMAND	PIC1
-#define PIC1_DATA	(PIC1+1)
-#define PIC2_COMMAND	PIC2
-#define PIC2_DATA	(PIC2+1)
-#define PIC_EOI	0x20
-
-//KERNEL SERVICES - PUBLIC
-void reboot();
-void halt();
-void uname();
-int run_program(char *name); //run program = load + call
-//void run_init();
-//void run_shell();
-
-//KERNEL SERVICES - PRIVATE
-unsigned int load(char *name,int *pid,unsigned int *seg); //loading program into memory
-void outb(int port, char value);
-void set_scheduler();
 extern void farcall(int seg,int ofs); //call the program
-
 extern int b_int8_seg;
 extern int b_int8_offs;
 
-//CPU RELATED
-void cli();
-void sti();
-void set_ivt();
-
-//BIOS RELATED
-//void clear_scr();
-void printstr(char *string);
-void _putchar(char in);
-char _getchar();
-void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
-void save_oldint8();
-
 void printf(char *string) {
 	printstr(string);
-}
-
-void startk() {
-	//--------------------
-	//Variable Declaration
-	//--------------------
-	int i;
-
-    //------------
-    //Code Section
-    //------------
-	printstr("starting kernel...\r\n");
-	init_seg();
-	set_ivt();
-	set_scheduler();
-	//sti();
-
-	mount("a");
-	sti();
-	//while (1) { run_init(); }
-	while (1) {
-		init_processes();
-		run_program("init");
-	}
 }
 
 //==============
@@ -123,6 +59,66 @@ void _putchar(char in) {
 //==================
 //END BIOS FUNCTIONS
 //==================
+
+void reboot() {
+	asm {
+		int 19h
+	}
+}
+
+void halt() {
+	asm {
+		hlt
+	}
+}
+
+void cli() {
+	asm {
+		cli
+	}
+}
+
+void sti() {
+	asm {
+		sti
+	}
+}
+
+void outb(int port, char value) {
+	asm {
+		push ax
+		push dx
+		mov dx,[port]
+		mov al,[value]
+		out dx,al
+		pop dx
+		pop ax
+	}
+}
+
+void startk() {
+	//--------------------
+	//Variable Declaration
+	//--------------------
+	int i;
+
+    //------------
+    //Code Section
+    //------------
+	printstr("starting kernel...\r\n");
+	init_seg();
+	set_ivt();
+	set_scheduler();
+	//sti();
+
+	mount("a");
+	sti();
+	//while (1) { run_init(); }
+	while (1) {
+		init_processes();
+		run_program("init");
+	}
+}
 
 void _dispatch(int service,SYSCALL_PARAM *params) {
 	int curr_pid;
@@ -273,18 +269,6 @@ void load_program(unsigned int segment,int prog_offset, char num_sectors,char cy
 	}
 }
 
-void reboot() {
-	asm {
-		int 19h
-	}
-}
-
-void halt() {
-	asm {
-		hlt
-	}
-}
-
 void uname() {
 	return;
 }
@@ -325,14 +309,6 @@ void set_ivt() {
 			mov es:[bx],ax ; segment for interrupt 80h
 	*/
 }
-
-//void run_init() {
-//	run_program("init");
-//}
-
-//void run_shell() {
-	//run_program("shell");
-//}
 
 //running a program by name
 //calling load to load the program into memory
@@ -384,30 +360,6 @@ int run_program(char *name) {
 	release_seg(segment);
 
 	return retcode;
-}
-
-void cli() {
-	asm {
-		cli
-	}
-}
-
-void sti() {
-	asm {
-		sti
-	}	
-}
-
-void outb(int port, char value) {
-	asm {
-		push ax
-		push dx
-		mov dx,[port]
-		mov al,[value]
-		out dx,al
-		pop dx
-		pop ax
-	}
 }
 
 void set_scheduler() {

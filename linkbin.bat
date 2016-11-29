@@ -12,9 +12,9 @@ IF ERRORLEVEL 1 pause
 tasm  d:\arch\8088\kernel\dispatch.asm >> result.txt 
 IF ERRORLEVEL 1 pause
 rem creating object file from C code
-tcc -Id:\include -mt -S d:\lib\stdlib.c
+tcc -Id:\include -mt -S d:\lib\stdlib.c d:\lib\ctype.c
 tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c 
-tcc -Id:\include -mt -c d:\lib\stdlib.c >> result.txt
+tcc -Id:\include -mt -c d:\lib\stdlib.c d:\lib\ctype.c >> result.txt
 tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c >> result.txt 
 
 
@@ -82,4 +82,4 @@ echo /////////////////
 echo full compile demo
 echo /////////////////
 tcc -Id:\include -mt -c d:\utils\demo.c
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\stdlib.obj d:\obj\demo.obj,demo.bin >> result.txt
+tlink /t /s head.obj io.obj mystdio.obj mystring.obj stdlib.obj ctype.obj demo.obj,demo.bin >> result.txt
