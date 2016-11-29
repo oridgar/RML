@@ -12,13 +12,17 @@ IF ERRORLEVEL 1 pause
 tasm  d:\arch\8088\kernel\dispatch.asm >> result.txt 
 IF ERRORLEVEL 1 pause
 rem creating object file from C code
+tcc -Id:\include -mt -S d:\lib\stdlib.c
 tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c 
+tcc -Id:\include -mt -c d:\lib\stdlib.c >> result.txt
 tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c >> result.txt 
+
 
 IF ERRORLEVEL 1 pause
 tcc -Id:\include -mt -S d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c
 tcc -Id:\include -mt -c d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c >> result.txt 
 IF ERRORLEVEL 1 pause
+
 rem FILE SYSTEM
 rem ------------------------------------
 echo ///////////
@@ -59,17 +63,23 @@ IF ERRORLEVEL 1 pause
 echo ////////////
 echo linking init
 echo ////////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\init.obj,init.bin >> result.txt 
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\stdlib.obj d:\obj\init.obj,init.bin >> result.txt 
 IF ERRORLEVEL 1 pause
 
 echo /////////////
 echo linking shell
 echo /////////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\shell.obj,shell.bin >> result.txt 
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\stdlib.obj d:\obj\shell.obj,shell.bin >> result.txt 
 IF ERRORLEVEL 1 pause
 
 echo //////////
 echo linking ls
 echo //////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\ls.obj,ls.bin >> result.txt 
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\stdlib.obj d:\obj\ls.obj,ls.bin >> result.txt 
 IF ERRORLEVEL 1 pause
+
+echo /////////////////
+echo full compile demo
+echo /////////////////
+tcc -Id:\include -mt -c d:\utils\demo.c
+tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\stdlib.obj d:\obj\demo.obj,demo.bin >> result.txt

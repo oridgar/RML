@@ -73,7 +73,8 @@ int print_file(Fat16Entry *file);
 int load_file_content(Fat16Entry *file,unsigned int segment,unsigned int offset);
 int extract_file_name(Fat16Entry *file,char *filename,char *ext);
 int get_file(Fat16Entry *file_list,char *name,Fat16Entry *file);
-
+int get_root_size();
+int get_root_offset();
 
 
 #endif

@@ -21,4 +21,5 @@ all:
 	cp ./obj/LS.BIN /mnt/LS.BIN
 	cp ./obj/INIT.BIN /mnt/INIT.BIN
 	cp ./obj/SHELL.BIN /mnt/SHELL.BIN
+	cp ./obj/DEMO.BIN /mnt/DEMO.BIN
 	umount /mnt

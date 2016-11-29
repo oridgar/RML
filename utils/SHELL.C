@@ -1,6 +1,7 @@
 #include "mystdio.h"
 #include "mystring.h"
 #include "linux\io.h"
+#include "stdlib.h"
 
 void main() {
 	shell();
@@ -14,6 +15,7 @@ int shell() {
 	char in;
 	int i;
 	int j;
+	int retcode;
 	
 	while (1) {
 		//Prompt
@@ -86,11 +88,20 @@ int shell() {
 		else if (strcmp(buf,"ps") != -1) {
 			get_process_list();
 		}
+		else if (strcmp(buf,"demo") != -1) {
+			retcode = run_program("demo");
+			printstr("\r\nreturn code: ");
+			mputchar('0' + retcode);
+			printstr("\r\n");
+
+		}
 		else {
 			//TODO: call to run_program and get return code from the kernel
 			//by that to decide if to print the following message
-			printstr(buf);
-			printstr(": command not found");
+			if (run_program(buf)) {
+				printstr(buf);
+				printstr(": command not found");
+			}
 		}
 	}
 	return 0;

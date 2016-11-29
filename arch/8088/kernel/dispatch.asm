@@ -4,6 +4,8 @@ ORG 0h
 
 global _farcall
 
+buf_size EQU 256
+
 ; INT 80h start points
 start: 		
 			;cli ; disable hardware interrupts while in system call
@@ -68,7 +70,7 @@ intr:
 			;-------------
 			;copy function
 			;-------------
-			mov cx,254
+			mov cx,buf_size
 			cld ; direction is forward
 cpy:		lodsw ; copy next word from user space to AX : LODSW (DS:SI -> AX) and SI++
 			stosw ; copy next word from AX to kernel space : STOSW (AX -> ES:DI) and DI++
@@ -105,7 +107,7 @@ cpy:		lodsw ; copy next word from user space to AX : LODSW (DS:SI -> AX) and SI+
 			
 			;saving data segment and buffer to return value
 			mov  ax,si
-			sub  ax,254*2
+			sub  ax,buf_size*2
 			push ax ;to use user parameters offset to return value
 			push [dsuser] ;to use user data segment to return value
 
@@ -129,7 +131,7 @@ disp:		mov  bx,offset params
 			;-------------
 			;copy function
 			;-------------
-			mov cx,254
+			mov cx,buf_size
 			cld ; direction is forward
 cpy2:		lodsw ; copy next word from kernel space to AX
 			stosw ; copy next word from AX to user space

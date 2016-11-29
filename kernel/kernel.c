@@ -26,12 +26,12 @@
 void reboot();
 void halt();
 void uname();
-void run_program(char *name); //run program = load + call
+int run_program(char *name); //run program = load + call
 //void run_init();
 //void run_shell();
 
 //KERNEL SERVICES - PRIVATE
-unsigned int load(char *name,int *pid); //loading program into memory
+unsigned int load(char *name,int *pid,unsigned int *seg); //loading program into memory
 void outb(int port, char value);
 void set_scheduler();
 extern void farcall(int seg,int ofs); //call the program
@@ -126,6 +126,7 @@ void _putchar(char in) {
 
 void _dispatch(int service,SYSCALL_PARAM *params) {
 	int curr_pid;
+	int fd;
 
 	switch (service) {
 		case 0:
@@ -152,14 +153,16 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 		case 7:
 			//run_shell();
 			curr_pid = get_running_proc();
-			run_program(params->param);
+			*(int *)params->param = run_program(params->param);
 			set_running_proc(curr_pid);
 			break;
 		case 8:
 			get_process_list();
 			break;
 		case 9:
-			list_root_files();
+			//fd = open("/",0);
+			//lseek(fd,0,0);
+			list_root_files(32);
 			break;
 		default:
 			break;
@@ -167,7 +170,7 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 	return;
 }
 
-unsigned int load(char *name,int *pid) {
+unsigned int load(char *name,int *pid,unsigned int *seg) {
 	unsigned int segment = get_free_seg();
 	int offset = 0x0000;
 	char num_sectors;
@@ -177,6 +180,7 @@ unsigned int load(char *name,int *pid) {
 	char drive;
 	Fat16Entry file_list[256];
 	Fat16Entry currfile;
+	int retcode = 0;
 	
 	//replace it with get_file and get_file_content
 	if (strcmp(name,"init") == 0) {
@@ -225,10 +229,33 @@ unsigned int load(char *name,int *pid) {
 		//head = 0x01;
 		//sector = 0x01;
 	}
-	//TODO: to be able to return another code that indicate that the program is not found!
-	register_proc(name,segment,segment,segment,offset,pid,get_running_proc());
+	else if (strcmp(name,"demo") == 0) {
+		get_root_files(file_list);
+		if (get_file(file_list,"DEMO",&currfile) == -1) {
+			printk("could not find file!!!\r\n");
+		}
+		else {
+			load_file_content(&currfile,segment,offset);
+		}
+	}
+	else {
+		get_root_files(file_list);
+		if (get_file(file_list,name,&currfile) == -1) {
+			printk("could not find file!!!\r\n");
+			retcode = 1;
+		}
+		else {
+			load_file_content(&currfile,segment,offset);
+		}
+	}
+	if (retcode == 0) {
+		//TODO: to be able to return another code that indicate that the program is not found!
+		register_proc(name,segment,segment,segment,offset,pid,get_running_proc());
+	}
 	
-	return segment;
+	*seg = segment;
+	//return segment;
+	return retcode;
 }
 
 void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive) {
@@ -310,48 +337,53 @@ void set_ivt() {
 //running a program by name
 //calling load to load the program into memory
 //calling farcall to run the program
-void run_program(char *name) {
+int run_program(char *name) {
 	unsigned int segment;
 	char seg_prefix;
 	int pid;
+	int retcode;
 
 	//printstr("loading ");
 	//printstr(name);
 	//printstr("...\r\n");
-	segment = load(name,&pid);
 
-	//printstr("loaded to 0x");
-	seg_prefix = '0' + (segment / 0x1000);
-	//_putchar(seg_prefix);
-//	printstr("000");
-//	printk(" pid: ");
-//	printk(myitoa(pid));
-//	printk(" ppid: ");
-//	printk(myitoa(get_running_proc()));
-//	printk("\r\n");
+	//segment = load(name,&pid);
+	retcode = load(name,&pid,&segment);
+
+	if (retcode == 0) {
+		//printstr("loaded to 0x");
+		seg_prefix = '0' + (segment / 0x1000);
+		//_putchar(seg_prefix);
+	//	printstr("000");
+	//	printk(" pid: ");
+	//	printk(myitoa(pid));
+	//	printk(" ppid: ");
+	//	printk(myitoa(get_running_proc()));
+	//	printk("\r\n");
+
+
+		//For now supporting only binary format. code origin is in 0x0000 or 0h
+		set_running_proc(pid);
+		farcall(segment,0x0000);
 	
-
-	//For now supporting only binary format. code origin is in 0x0000 or 0h
-	set_running_proc(pid);
-	farcall(segment,0x0000);
-
-//	printstr("returned to kernel...\r\n");
-//	if (segment == 0x2000) {
-//		printstr("0x2000\r\n");
-//	}
-//	else if (segment == 0x3000) {
-//		printstr("0x3000\r\n");
-//	}
-//	else if (segment == 0x4000) {
-//		printstr("0x4000\r\n");
-//	}
-//	else if (segment == 0x5000) {
-//		printstr("0x5000\r\n");
-//	}
+	//	printstr("returned to kernel...\r\n");
+	//	if (segment == 0x2000) {
+	//		printstr("0x2000\r\n");
+	//	}
+	//	else if (segment == 0x3000) {
+	//		printstr("0x3000\r\n");
+	//	}
+	//	else if (segment == 0x4000) {
+	//		printstr("0x4000\r\n");
+	//	}
+	//	else if (segment == 0x5000) {
+	//		printstr("0x5000\r\n");
+	//	}
+		unregister_proc(pid);
+	}
 	release_seg(segment);
-	unregister_proc(pid);
 
-	return;
+	return retcode;
 }
 
 void cli() {

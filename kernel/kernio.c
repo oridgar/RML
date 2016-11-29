@@ -16,11 +16,23 @@ int open(const char *pathname, int flags) {
 	if (strcmp(pathname,"/dev/fda") == 0) {
 		//strcpy(fd_list[3].pathname,"/dev/fda");
 		fd_list[3].pos = 0;
+		fd_list[3].pfd = -1;
+		fd_list[3].size = 65535;
+
 		return 3;
 	}
 	else if (strcmp(pathname,"/dev/fdb") == 0) {
 		fd_list[4].pos = 0;
+		fd_list[4].pfd = -1;
+		fd_list[4].size = 65535;
 		return 4;
+	}
+	else if (strcmp(pathname,"/") == 0) {
+		fd_list[5].pos = 0;
+		fd_list[5].size = get_root_size();
+		fd_list[5].pfd = 4;
+		fd_list[5].pfd_offset = get_root_offset();
+		return 5;
 	}
 	return -1;
 }
@@ -52,80 +64,107 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	new_buf = (char *) buf;
 	//DEBUG
 	//printk("entered to read \r\n");
-	//END DEBUG
-	if (fd == 3) {
-		drive = 0x00;
-		drive_num_cylinder = 80;
-		drive_num_heads = 2;
-		drive_num_sectors = 18;
-		//floppy a
-	}
-	else if (fd == 4) {
-		drive = 0x01;
-		drive_num_cylinder = 80;
-		drive_num_heads = 2;
-		drive_num_sectors = 18;
-		//floppy b
+//	if (fd == 5) {
+//		printk("reading fd: ");
+//		printk(myitoa(fd));
+//		printk(" pfd= ");
+//		printk(myitoa(fd_list[fd].pfd));
+//		printk(" pfd_offset= ");
+//		printk(myitoa(fd_list[fd].pfd_offset));
+//		printk(" pos= ");
+//		printk(myitoa(fd_list[fd].pos));
+//
+//		printk("\r\n");
+//	}
+
+	if (fd_list[fd].size <=  fd_list[fd].pos) {
+		//need to return EOF
+
+		//to calculate left bytes to read
+		//fd_list[fd].size - fd_list[fd].pos
 	}
 
-	//converting lba to chs
-	lba_to_chs(fd_list[fd].pos,drive_num_cylinder,drive_num_heads,drive_num_sectors,&cylinder,&head,&sector);
-	if (count == 0) {
-		num_sectors = 0;
+	//END DEBUG
+	if (fd_list[fd].pfd != -1) {
+		lseek(fd_list[fd].pfd,fd_list[fd].pfd_offset + fd_list[fd].pos,0);
+		read(fd_list[fd].pfd,new_buf,count);
 	}
 	else {
-		num_sectors = (count - 1) / 512 + 1;
-	}
-	num_bytes = count;
-	sector_offset = fd_list[fd].pos % 512;
-
-	//each iteration, reading from current cylinder and head
-	while (num_sectors > 0) {
-		//moves to the next head
-		if (sector > 18 ) {
-			//read (18 - sector + 1) sectors
-			sector = 1;
-			head = (head + 1) % 2;
-			if (head == 0) {
-				cylinder++;
-			}
-			//num_sectors -= 18 - sector + 1; //decrement number of sectors read already
+		if (fd == 3) {
+			drive = 0x00;
+			drive_num_cylinder = 80;
+			drive_num_heads = 2;
+			drive_num_sectors = 18;
+			//floppy a
 		}
-		//DEBUG
-//		printk("reading cylinder: ");
-//		printk(myitoa((int)cylinder));
-//		printk(" head: ");
-//		printk(myitoa((int)head));
-//		printk(" sector: ");
-//		printk(myitoa((int)sector));
-
-		//END DEBUG
-		//reading into kernel segment
-		if (read_sectors(segment,(int)sector_buf, 1 ,cylinder,sector, head, drive)) {
-			printk("error reading sectors!\r\n");
+		else if (fd == 4) {
+			drive = 0x01;
+			drive_num_cylinder = 80;
+			drive_num_heads = 2;
+			drive_num_sectors = 18;
+			//floppy b
 		}
 
-//		printk(" to address:");
-//		//printk(myitoa((unsigned int)buf));
-//		//printk(" new_buf:");
-//		printk(myitoa((unsigned int)new_buf));
-//		printk("\r\n");
-
-		if (num_bytes > 512) {
-			memcpy(new_buf,sector_buf+sector_offset,512);
-			num_bytes -= 512 - sector_offset;
+		//converting lba to chs
+		lba_to_chs(fd_list[fd].pos,drive_num_cylinder,drive_num_heads,drive_num_sectors,&cylinder,&head,&sector);
+		if (count == 0) {
+			num_sectors = 0;
 		}
 		else {
-			memcpy(new_buf,sector_buf+sector_offset,num_bytes);
-			num_bytes = 0;
+			num_sectors = (count - 1) / 512 + 1;
 		}
-		//(char)buf += 512 - sector_offset;
-		new_buf += 512 - sector_offset;
-		num_sectors--;
-		sector++;
-		sector_offset = 0;
-	}
+		num_bytes = count;
+		sector_offset = fd_list[fd].pos % 512;
 
+		//each iteration, reading from current cylinder and head
+		while (num_sectors > 0) {
+			//moves to the next head
+			if (sector > 18 ) {
+				//read (18 - sector + 1) sectors
+				sector = 1;
+				head = (head + 1) % 2;
+				if (head == 0) {
+					cylinder++;
+				}
+				//num_sectors -= 18 - sector + 1; //decrement number of sectors read already
+			}
+			//DEBUG
+	//		printk("reading cylinder: ");
+	//		printk(myitoa((int)cylinder));
+	//		printk(" head: ");
+	//		printk(myitoa((int)head));
+	//		printk(" sector: ");
+	//		printk(myitoa((int)sector));
+
+			//END DEBUG
+			//reading into kernel segment
+			if (read_sectors(segment,(int)sector_buf, 1 ,cylinder,sector, head, drive)) {
+				printk("error reading sectors!\r\n");
+			}
+
+	//		printk(" to address:");
+	//		//printk(myitoa((unsigned int)buf));
+	//		//printk(" new_buf:");
+	//		printk(myitoa((unsigned int)new_buf));
+	//		printk("\r\n");
+
+			if (num_bytes > 512) {
+				memcpy(new_buf,sector_buf+sector_offset,512);
+				num_bytes -= 512 - sector_offset;
+			}
+			else {
+				memcpy(new_buf,sector_buf+sector_offset,num_bytes);
+				num_bytes = 0;
+			}
+			//(char)buf += 512 - sector_offset;
+			new_buf += 512 - sector_offset;
+			num_sectors--;
+			sector++;
+			sector_offset = 0;
+		}
+
+
+	}
 	fd_list[fd].pos += count;
 	return 0;
 }
@@ -176,6 +215,9 @@ int mount(char * filename) {
 
     //printk("reading fat\r\n");
     read_fat(fat_table);
+
+    //opening root filesystem
+    open("/",0);
 
     //printk("reading root directory content\r\n");
     //read_root_dir(root_dir_content);
@@ -267,4 +309,8 @@ cpy:
 		pop ax
 		pop di
 	}
+}
+
+int getdents(unsigned int fd, linux_dirent *dirp, unsigned int count) {
+	return 0;
 }

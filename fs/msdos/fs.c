@@ -141,22 +141,77 @@ int get_next_cluster(unsigned int curr_cluster,unsigned int *next_cluster) {
 
 int get_root_files(Fat16Entry *files) {
 	int i;
-	//FILL IN!
-	//fseek(drv, s_pos.root_directory_start , SEEK_SET);
+
+
+	lseek(5,0,0);
+	for(i=0; i < bs.root_dir_entries;i++) {
+		read(5,&files[i], sizeof(Fat16Entry));
+	}
+
+
+	/*
+	printk("reading root files. start pos: ");
+	printk(myitoa(s_pos.root_directory_start));
+	printk("\r\n");
 	lseek(4,s_pos.root_directory_start, 0);
 
 	for(i=0; i < bs.root_dir_entries;i++) {
-		//fread(&files[i], sizeof(Fat16Entry), 1, drv);
 		read(4,&files[i], sizeof(Fat16Entry));
+
 	}
+*/
+
 	return 0;
 }
 
-int list_root_files() {
-	Fat16Entry file_list[256];
-	get_root_files(file_list);
-	list_files(file_list);
+int get_root_next_file(Fat16Entry *file) {
+	read(5,file, sizeof(Fat16Entry));
+
 	return 0;
+}
+
+int list_root_files(int size) {
+	int i;
+	int fd;
+	int files_read = 0;
+	Fat16Entry file;
+	fileAttrib attrib;
+	char name[9];
+	char ext[4];
+
+	// TODO: remove opening and seeking root folder and make sure get_root_next_file returns value that
+	// indicates there are no more files
+	fd = open("/",0);
+	lseek(fd,0,0);
+	// && sizeof(Fat16Entry)*files_read < size
+	for (i=0; i < bs.root_dir_entries; i++) {
+		get_root_next_file(&file);
+		if (get_entry_type(&file) == TYPE_FILE) {
+			//deleted file
+			if (file.filename[0] == 0xe5) {
+				continue;
+			}
+			//no file
+			else if (file.filename[0] == 0x00) {
+				break;
+			}
+			else {
+				extract_file_name(&file,name,ext);
+				printk(name);
+				printk(".");
+				printk(ext);
+				printk("   ");
+				files_read++;
+			}
+			file_attrib(&file,&attrib);
+			//print_file_attrib(&files[i],&attrib);
+		}
+
+	}
+	//get_root_files(file_list);
+	//list_files(file_list);
+	//getdents
+	return files_read;
 }
 
 
@@ -346,4 +401,12 @@ int get_file(Fat16Entry *file_list,char *name,Fat16Entry *file) {
     }
 
 	return -1;
+}
+
+int get_root_size() {
+	return s_pos.data_section_start - s_pos.root_directory_start;
+}
+
+int get_root_offset() {
+	return s_pos.root_directory_start;
 }
