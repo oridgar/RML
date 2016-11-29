@@ -1,5 +1,6 @@
 megs: 32
 floppya: 1_44=.\obj\disk1.img, status=inserted
 boot: a
-log: bochsout.txt
+log: e:\bochsout.txt
 mouse: enabled=0
+display_library: win32

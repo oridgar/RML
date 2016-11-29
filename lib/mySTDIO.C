@@ -1,4 +1,9 @@
+#ifndef mystdio
 #include "mystdio.h"
+#define mystdio
+#endif
+
+//typedef unsigned long size_t;
 
 void printstr(char *string) {
 	int i = 0;
@@ -6,7 +11,6 @@ void printstr(char *string) {
 		mputchar(string[i]);
 		i++;
 	}
-
 }
 
 char getchar() {
@@ -36,3 +40,30 @@ void mputchar(char in) {
 		  int 10h
 	}
 }
+
+int printf(const char *format, ...) {
+	int i = 0;
+	while (format[i] != 0) {
+		mputchar(format[i]);
+		i++;
+	}
+	return i;
+}
+
+/*
+int scanf(const char *format, ...) {
+	return 0;
+}
+
+
+size_t fread(void *ptr, size_t size, size_t nobj, FILE *stream) {
+	
+}
+
+size_t fwrite(const void *ptr, size_t size, size_t nobj, FILE *stream) {
+	
+}
+int    fseek(FILE *stream, long offset, int origin) {
+	
+}
+*/

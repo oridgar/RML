@@ -2,3 +2,5 @@ obj
 
 test
 *.exe
+*.com
+*.bin
