@@ -11,6 +11,6 @@ void main() {
 	} */
 	printstr(str1);
 	printstr(str2);
-	run_shell();
+	run_program("shell");
 	//return 0;
 }

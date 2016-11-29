@@ -8,32 +8,44 @@
 #define STRING
 #endif
 
-int xload(char *name);
+//KERNEL SERVICES - PUBLIC
 void reboot();
 void halt();
 void uname();
+void run_program(char *name); //run program = load + call
+//void run_init();
+//void run_shell();
+
+//KERNEL SERVICES - PRIVATE
+int load(char *name); //loading program into memory
+extern void farcall(int seg,int ofs); //call the program
+
+//CPU RELATED
+void cli();
+void sti();
 void set_ivt();
+
+//BIOS RELATED
 void clear_scr();
-void run_init();
-void run_shell();
-void run_program(char *name);
 void printstr(char *string);
 void _putchar(char in);
 char _getchar();
 void load_program(int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
-void cli();
-void sti();
-extern void farcall(int seg,int ofs);
+
+
 
 void startk() {
 	int i;
 	printstr("starting kernel...\r\n");
-	//xrun("shell");
-	//_dispatch();
 	init_seg();
 	set_ivt();
-	while (1) { run_init(); }
+	//while (1) { run_init(); }
+	while (1) { run_program("init"); }
 }
+
+//==============
+//BIOS FUNCTIONS
+//==============
 
 char _getchar() {
 	char temp;
@@ -71,6 +83,10 @@ void _putchar(char in) {
 	}
 }
 
+//==================
+//END BIOS FUNCTIONS
+//==================
+
 void _dispatch(int service,SYSCALL_PARAM *params) {
 	switch (service) {
 		case 0:
@@ -95,31 +111,16 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			params->param[0] = _getchar();
 			break;
 		case 7:
-			run_shell();
+			//run_shell();
+			run_program(params->param);
 			break;
 		default:
 			break;
 	}
-	/*
-			;cmp al,00h ; print something
-			;je  prt
-			cmp al,01h ; halt the computer
-			;je  halt
-			call _halt
-			cmp al,02h ; reboot
-			;je reboot
-			call _reboot
-			;cmp al,03h ; getchar
-			;call __getchar
-			;cmp al,04h ; putchar
-			;call __putchar
-			cmp al,05h ; testing
-	*/
 	return;
 }
 
-int xload(char *name) {
-	//int segment = 0x2000;
+int load(char *name) {
 	int segment = get_free_seg();
 	int offset = 0x0000;
 	char num_sectors;
@@ -143,28 +144,8 @@ int xload(char *name) {
 		sector = 0x01;
 	}
 	
-	//TODO: change to checking name param and decide by it what to load.
-	//if(1) {
-		//hard coded position of init program compiled with shell
-		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
-	//}
+	load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
 		
-	/*
-	loadsh:
-	asm {
-		    mov  ah,0x02 //Read Sectors From Drive service
-			mov  al,0x02 //number of sectors to read
-			mov	 ch,0x00 // cylinder/track 
-			mov  cl,0x03 //start from SECTOR 3
-			mov  dh,0x00 //head 0
-			mov  dl,0x00 //drive
-			mov  bx,[shseg] //TODO - take the value from variable!!!
-			//mov  es,[shseg]  //second 64K segment (pass by value)
-			mov  es,bx  //second 64K segment (pass by value)
-			mov  bx,0x0  //load to 0h (binary file org 0 instead of com file)
-			int  13h 
-	}
-	*/
 	return segment;
 }
 
@@ -236,20 +217,23 @@ void set_ivt() {
 	*/
 }
 
-void run_init() {
-	run_program("init");
-}
+//void run_init() {
+//	run_program("init");
+//}
 
-void run_shell() {
-	run_program("shell");
-}
+//void run_shell() {
+	//run_program("shell");
+//}
 
+//running a program by name
+//calling load to load the program into memory
+//calling farcall to run the program
 void run_program(char *name) {
 	int segment;
 	printstr("loading ");
 	printstr(name);
 	printstr("...\r\n");
-	segment = xload(name);
+	segment = load(name);
 
 	if (segment == 0x2000) {
 		printstr("loaded to 0x2000\r\n");

@@ -7,18 +7,18 @@ del *.bin
 
 rem creating object file from ASM code which will initiate C code
 tasm  d:\utils\head.asm
-pause
+IF ERRORLEVEL 1 pause
 tasm  d:\arch\8088\kernel\dispatch.asm
-pause
+IF ERRORLEVEL 1 pause
 rem creating object file from C code
 tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c
 tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\mystring.c d:\lib\mystdio.c d:\arch\8088\kernel\io.c d:\init\init.c
 
-pause
+IF ERRORLEVEL 1 pause
 tcc -Id:\include -mt -S d:\kernel\fdsptch.c d:\mm\mm.c
 tcc -Id:\include -mt -c d:\kernel\fdsptch.c d:\mm\mm.c
 
-pause
+IF ERRORLEVEL 1 pause
 rem ------------------------------------
 rem tcc -Id:\include -mt -c d:\fs\msdos\example.c 
 rem pause
@@ -46,19 +46,19 @@ echo //////////////
 echo linking kernel
 echo //////////////
 tlink /t /s dispatch.obj fdsptch.obj mm.obj mystring.obj,kernel.bin
-pause
+IF ERRORLEVEL 1 pause
 
 echo ////////////
 echo linking init
 echo ////////////
 tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\init.obj,init.bin
-pause
+IF ERRORLEVEL 1 pause
 
 echo /////////////
 echo linking shell
 echo /////////////
 tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\mystdio.obj d:\obj\mystring.obj d:\obj\shell.obj,shell.bin
-pause
+IF ERRORLEVEL 1 pause
 
 rem echo //////////////////
 rem echo linking shell+init

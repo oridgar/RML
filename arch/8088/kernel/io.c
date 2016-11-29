@@ -14,7 +14,7 @@ void _putchar(char in);
 
 SYSCALL_PARAM sysparam;
 
-//TEMP REGION
+//TEMP REGION - DIRECT CALLING SCREEN AND KEYBOARD FROM BIOS
 void dprintstr(char *string);
 void dputchar(char in);
 char dgetchar();
@@ -63,7 +63,7 @@ char dgetchar() {
 	return temp;
 }
 
-//END TEMP REGION
+//END TEMP REGION - DIRECT CALLING SCREEN AND KEYBOARD FROM BIOS
 
 
 void syscall(int service) {
@@ -116,6 +116,7 @@ void _putchar(char in) {
 	//dputchar(in);
 }
 
+
 char _getchar() {
 	syscall(0x06);
 	return sysparam.param[0];
@@ -123,49 +124,23 @@ char _getchar() {
 }
 
 void call_int() {
-	/*asm {
-		mov al,00h
-		int 80h
-	}
-	*/
 	syscall(0x00);
 }
 
 void halt() {
-	/*
-	asm {
-		mov al,01h
-		int 80h
-	}
-	*/
 	syscall(0x01);
 }
 
 void reboot() {
-	/*
-	asm {
-		mov al,02h
-		int 80h
-	}
-	*/
 	syscall(0x02);
 }
 
 void dispatch() {
-	/*asm {
-		mov al,05h
-		int 80h
-	}
-	*/
 	syscall(0x05);
 }
 
-void run_shell() {
-	/*asm {
-		mov al,05h
-		int 80h
-	}
-	*/
+void run_program(char *string) {
+	memcpy(string,sysparam.param,512);
 	syscall(0x07);
 }
 
