@@ -47,7 +47,7 @@ prep_p:		;------------
 			;-------------
 			;copy function
 			;-------------
-			mov cx,256 ;TODO: make sure the size will be right
+			mov cx,256
 			cld ; direction is forward
 cpy:		lodsw ; copy next word from user space to AX
 			stosw ; copy next word from AX to kernel space
@@ -81,7 +81,7 @@ disp:		mov  bx,offset params
 			;-------------
 			;copy function
 			;-------------
-			mov cx,256 ;TODO: make sure the size will be right
+			mov cx,256
 			cld ; direction is forward
 cpy2:		lodsw ; copy next word from kernel space to AX
 			stosw ; copy next word from AX to user space
@@ -122,12 +122,13 @@ sysexit:	pop di
 			;sti
 			iret
 
-;_farcall PROC
-_farcall:
+_farcall PROC
+;_farcall:
 	;ARG in_ofs:WORD
 	;ARG in_segm:WORD
 	
 	;the caller first pushes the offset and then the segment!
+	;stack content: offset, segment, caller offset to the next instruction, caller base pointer
 	
 	push bp
 	mov  bp,sp
@@ -143,7 +144,7 @@ _farcall:
     segm dw 0h
 	pop bp
 	RET
-;_farcall ENDP
+_farcall ENDP
 
 
 			

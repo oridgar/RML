@@ -4,7 +4,14 @@
 ORG 0h
 
 start: 		
+			push ax
+			push bx
+			push cx
+			push dx
+			push es
 			push ds ; saving data segment
+			push si
+			push di
 			mov ax, cs ; saving code segment
 			mov ds,ax ; copying code segment to data segment
 
@@ -19,11 +26,18 @@ chr:		lodsb
 			jmp  chr
 
 ;start init program
-init:	    sti
-			call _init
+init:	    call _init
 ;return to kernel
+			pop di
+			pop si
 			pop ds
-			retf ; return far to the kernel segment
+			pop es
+			pop dx
+			pop cx
+			pop bx
+			pop ax
+			;retf ; return far to the kernel segment
+			db 0cbh ; RETF code
 
 extrn	_init:near
 msg		db	'starting init...',13,10,0

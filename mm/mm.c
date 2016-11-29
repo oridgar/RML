@@ -12,7 +12,7 @@ void init_seg() {
 	seg_arr[1].used = 1; //kernel
 	seg_arr[1].address = 0x1000;
 	
-	seg_arr[2].used = 0;
+	seg_arr[2].used = 0; 
 	seg_arr[2].address = 0x2000;
 	
 	seg_arr[3].used = 1; //stack
@@ -48,4 +48,25 @@ int get_free_seg() {
 		}
 	}
 	return seg;
+}
+
+int release_seg(int seg) {
+	int i;
+	char num;
+	for (i=0; i < NUM_SEG; i++) {
+		
+		printstr("checking segment number ");
+		num = '1' + i;
+		_putchar(num);
+		printstr("...");
+		if (seg_arr[i].address == seg) {
+			//printstr("released!\r\n");
+			//printstr('0' + (char)i);
+			seg_arr[i].used = 0;
+			printstr("released!\r\n");
+			break;
+		}
+		printstr("\r\n");
+	}
+	return i;
 }

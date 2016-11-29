@@ -22,7 +22,7 @@ void syscall(int service) {
 }
 
 void _printstr(char *string) {
-	memcpy(string,sysparam.param,32);
+	memcpy(string,sysparam.param,512);
 	syscall(0x04);
 }
 

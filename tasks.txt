@@ -57,8 +57,10 @@ Fixes
 
 More fixes
 ----------
-1. memory manager - build an array in the kernel to manage segments and load programs dynamically.
-2. separate shell from init and load shell from init by system call.
+1. memory manager - build an array in the kernel to manage segments and load programs dynamically - V
+2. fix bug when returning from init to kernel, segment variable value is truncated. SOMETHING WRONG WITH THE STACK!!!
+   it seems that the call far function doing something - V
+3. separate shell from init and load shell from init by system call.
 
 standard library
 ----------------

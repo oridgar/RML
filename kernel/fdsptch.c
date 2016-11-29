@@ -20,6 +20,7 @@ void sti();
 extern void farcall(int seg,int ofs);
 
 void startk() {
+	int i;
 	printstr("starting kernel...\r\n");
 	//xrun("shell");
 	//_dispatch();
@@ -211,6 +212,8 @@ void set_ivt() {
 	*/
 }
 
+
+
 void run_init() {
 	int segment;
 	printstr("loading init...\r\n");
@@ -218,6 +221,9 @@ void run_init() {
 
 	if (segment == 0x2000) {
 		printstr("loaded to 0x2000\r\n");
+	}
+	else if (segment == 0x3000) {
+		printstr("loaded to 0x3000\r\n");
 	}
 	else if (segment == 0x4000) {
 		printstr("loaded to 0x4000\r\n");
@@ -228,33 +234,13 @@ void run_init() {
 	
 	farcall(segment,0x0000);
 
-	/*
-	asm {
-				jmp myfar2
-	}
-	*/
-	
-	myfar:
-	asm {
+
+	/*asm {
 				db 9Ah // CALL FAR instruction
 			  //db  0eah //JMP FAR instruction 
-	}
-	ofs:
-	asm {
 				dw  0 //offset
-	}
-	segm:
-	asm {
 				dw  2000h //segment TODO:get it by parameter and not hard coded!
-	}
-	/*
-	myfar2:
-	asm {
-				mov ax,[segment]
-				mov [segm],ax
-				jmp myfar
-	}
-	*/
+	}*/
 	
 	//macro example
 	/*
@@ -266,6 +252,22 @@ void run_init() {
         And then use 
 	FARCALL 0043h, 0130h 
 	*/
+
+	printstr("returned to kernel...\r\n");
+	if (segment == 0x2000) {
+		printstr("0x2000\r\n");
+	}
+	else if (segment == 0x3000) {
+		printstr("0x3000\r\n");
+	}
+	else if (segment == 0x4000) {
+		printstr("0x4000\r\n");
+	}
+	else if (segment == 0x5000) {
+		printstr("0x5000\r\n");
+	}
+	release_seg(segment);
+		
 	return;
 }
 

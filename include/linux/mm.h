@@ -2,6 +2,7 @@
 
 int get_free_seg();
 void init_seg();
+int release_seg(int seg);
 
 typedef struct 
 {
