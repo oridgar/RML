@@ -117,9 +117,9 @@ void _putchar(char in) {
 }
 
 char _getchar() {
-	//syscall(0x06);
-	//return sysparam.param[0];
-	return dgetchar();
+	syscall(0x06);
+	return sysparam.param[0];
+	//return dgetchar();
 }
 
 void call_int() {

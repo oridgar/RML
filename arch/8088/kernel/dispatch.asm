@@ -100,8 +100,10 @@ cpy:		lodsw ; copy next word from user space to AX
 			
 			
 			;saving data segment and buffer to return value
-			push si
-			push ds
+			mov  ax,si
+			sub  ax,254*2
+			push ax
+			push [dsuser]
 			
 			;-------------------------------------------------
 			;Align data segment to be the same as code segment
@@ -124,16 +126,16 @@ disp:		mov  bx,offset params
 			pop es ; user space data segment to ES
 			pop di
 
-;			mov si, offset params
+			mov si, offset params
 			
 			;-------------
 			;copy function
 			;-------------
-;			mov cx,254
-;			cld ; direction is forward
-;cpy2:		lodsw ; copy next word from kernel space to AX
-;			stosw ; copy next word from AX to user space
-;			loop cpy2
+			mov cx,254
+			cld ; direction is forward
+cpy2:		lodsw ; copy next word from kernel space to AX
+			stosw ; copy next word from AX to user space
+			loop cpy2
 			;---------------
 			;end of function
 			;---------------			
