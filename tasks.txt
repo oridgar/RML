@@ -1,0 +1,29 @@
+Peripherals to manage:
+1. keyboard
+2. screen
+
+file structure:
+arch - machine dependent code
+arch/8088/boot - boot loader code
+arch/8088/kernel - kernel assembly code
+arch/8088/mm - memory management low level
+include - user libraries header files
+lib - user libraries, both C standard library and linux system call wrappers
+init - init system, first user process
+utils - user space utilities such as minimized shell
+
+Code:
+1. write stage 1 boot loader in MBR
+2. write stage 2 boot loader binary mode on floppy (no file)
+3. write assembly code to map between assembly low-level instructions to C language.
+3.1. includes cli,sti,in,out
+3.2. includes mapping BIOS to C language
+4. write kernel basics (syscalls such as working with screen, keyboard)
+5. write basic memory management (allocate/free memory, etc.)
+6. wrap kernel with system call library functions (use int 0x80)
+7. write simple shell that answers to commands
+
+
+segments:
+0000h - IVT, Boot loader, 
+
