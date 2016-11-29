@@ -11,6 +11,7 @@
 #include "types.h"
 #include "bios.h"
 #include "linux/kernio.h"
+#include "linux/sched.h"
 
 //PIC
 #define PIC1	0x20
@@ -30,7 +31,7 @@ void run_program(char *name); //run program = load + call
 //void run_shell();
 
 //KERNEL SERVICES - PRIVATE
-unsigned int load(char *name); //loading program into memory
+unsigned int load(char *name,int *pid); //loading program into memory
 void outb(int port, char value);
 void set_scheduler();
 extern void farcall(int seg,int ofs); //call the program
@@ -68,6 +69,7 @@ void startk() {
 	init_seg();
 	set_ivt();
 	set_scheduler();
+	init_processes();
 	//sti();
 
 	mount("a");
@@ -121,6 +123,8 @@ void _putchar(char in) {
 //==================
 
 void _dispatch(int service,SYSCALL_PARAM *params) {
+	int curr_pid;
+
 	switch (service) {
 		case 0:
 			printstr("system call!\r\n");
@@ -145,7 +149,9 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			break;
 		case 7:
 			//run_shell();
+			curr_pid = get_running_proc();
 			run_program(params->param);
+			set_running_proc(curr_pid);
 			break;
 		default:
 			break;
@@ -153,7 +159,7 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 	return;
 }
 
-unsigned int load(char *name) {
+unsigned int load(char *name,int *pid) {
 	unsigned int segment = get_free_seg();
 	int offset = 0x0000;
 	char num_sectors;
@@ -196,6 +202,7 @@ unsigned int load(char *name) {
 		//sector = 0x01;
 	}
 	//TODO: to be able to return another code that indicate that the program is not found!
+	register_proc(name,segment,segment,segment,offset,pid);
 	
 	return segment;
 }
@@ -282,17 +289,23 @@ void set_ivt() {
 void run_program(char *name) {
 	unsigned int segment;
 	char seg_prefix;
+	int pid;
+
 	printstr("loading ");
 	printstr(name);
 	printstr("...\r\n");
-	segment = load(name);
+	segment = load(name,&pid);
 
 	printstr("loaded to 0x");
 	seg_prefix = '0' + (segment / 0x1000);
 	_putchar(seg_prefix);
-	printstr("000\r\n");
+	printstr("000");
+	printk(" pid: ");
+	printk(myitoa(pid));
+	printk("\r\n");
 	
 	//For now supporting only binary format. code origin is in 0x0000 or 0h
+	set_running_proc(pid);
 	farcall(segment,0x0000);
 
 //	printstr("returned to kernel...\r\n");
@@ -309,7 +322,8 @@ void run_program(char *name) {
 //		printstr("0x5000\r\n");
 //	}
 	release_seg(segment);
-		
+	unregister_proc(pid);
+
 	return;
 }
 

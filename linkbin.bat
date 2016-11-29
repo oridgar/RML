@@ -53,7 +53,7 @@ rem note that /t is tiny - no executable header but binary format. /s is for cre
 rem at the end there is comma and after that the name of the output file. THIS IS IMPORTANT AS WITHOUT THIS FORMAT THE LINKER WILL SHOUT ON THE FACT THAT
 rem THE CODE IS NOT STARTED AT ORIGIN 100h.
 rem also dispatch.obj must be first as it is an assembly code with entry point and the linker demands that the first file will includes entry point
-tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj mystring.obj fs.obj bios.obj kernio.obj,kernel.bin >> result.txt 
+tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj bios.obj kernio.obj fs.obj mystring.obj ,kernel.bin >> result.txt 
 IF ERRORLEVEL 1 pause
 
 echo ////////////
