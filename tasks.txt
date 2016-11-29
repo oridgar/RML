@@ -1,8 +1,12 @@
 Peripherals to manage:
 1. keyboard
 2. screen
+3. floppy
 
+---------------
 file structure:
+---------------
+
 arch - machine dependent code
 arch/8088/boot - boot loader code
 arch/8088/kernel - kernel assembly code
@@ -12,19 +16,75 @@ lib - user libraries, both C standard library and linux system call wrappers
 init - init system, first user process
 utils - user space utilities such as minimized shell
 
+-----
 Code:
-1. write stage 1 boot loader in MBR
-2. write stage 2 boot loader binary mode on floppy (no file)
-3. write assembly code to map between assembly low-level instructions to C language.
-3.1. includes cli,sti,in,out
-3.2. includes mapping BIOS to C language
-4. write kernel basics (syscalls such as working with screen, keyboard)
-6. wrap kernel with system call library functions (use int 0x80)
-7. write simple shell that answers to commands
-5. write basic memory management (allocate/free memory, etc.)
-8. basic filesystem
-9. loader (executable files without header, just put in free segment)
+-----
 
+boot
+----
+1. write stage 1 boot loader in MBR - V
+
+kernel
+------
+1. create kernel program, with CPU initialization - V
+2. basic loader (executable files without header, just put in free segment). block mode reading.
+
+init
+----
+1. load init program + call it - V
+
+system calls
+------------
+1. create dispatcher - V
+2. create system call user library - V
+3. create ASM mapper to dispatcher (user & system sides) - V
+4. register dispatcher in IVT at 80h - V
+
+shell
+-----
+1. write simple shell that answers to commands and uses system calls - V
+
+Fixes
+-----
+1. build a structure in order to pass parameter to system calls - V.
+2. the pointer of the user structure will be in register SI - V.
+3. kernel should copy the data and push a pointer to the stack, allowing dispatcher to use as reference param - V
+4. call putchar and printstr system calls directly from shell and check that it works - V
+5. update stdio putchar and printstr to call system calls instead BIOS - V
+6. call getchar system call directly from shell and check that it works - V
+7. update stdio getchar to call system calls instead BIOS - V
+
+
+More fixes
+----------
+1. memory manager - build an array in the kernel to manage segments and load programs dynamically.
+2. separate shell from init and load shell from init by system call.
+
+standard library
+----------------
+1. implement the most used functions of C standard library
+
+IO
+--
+1. write assembly code to map between assembly low-level instructions to C language.
+1.1. includes cli,sti,in,out
+
+Next release (file system):
+-------------
+1. compile file system into kernel and map it to kernel low level sector reading.
+2. put init and shell in a filesystem instead reading from sectors directly.
+3. load init and shell from the filesystem.
+
+
+Next release (scheduler):
+-------------
+1. how to program PIC (IRQ0 to interrupt handler)
+2. how to program PIT (timer configurations)
+3. handler will be a part of the scheduler in assembly.
+
+Next release:
+-------------
+1. memory management - malloc and free for user space.
 
 ---------
 registers
@@ -64,6 +124,26 @@ flags register
 cannot read directly. some instructions use the flags (such as conditional jumps).
 
 
+how function call works
+-----------------------
+each call creates "stack frame", in which you can find:
+1. the arguments from the caller (push is in reverse order to the parameter position. first parameter will be pushed last)
+2. return value (second push) - optional!!!
+3. caller address
+4. local variables
+
+the first instructions when entering function:
+push bp
+mov bp,sp
+
+bp(base pointer) will point to the beginning of the stack frame for the current function.
+to refer to sent arguments,we need to add numbers to bp (as the stack decreases and everything pushed before will be
+in higher addresses).
+to refer to local variables, we need to decrease numbers from bp.
+
+at the end of the function we will pop the base pointer
+
+
 
 memory map - segments:
 ----------------------
@@ -81,15 +161,15 @@ A000h -> F000h - BIOS and memory mapped hardware
 
 diskette map
 ------------
-C0,H0,S0 - boot loader (volume boot record)
-C0,H0,S1 - extended boot loader
-C0,H0,S2 - shell code
+C0,H0,S1 - boot loader (volume boot record)
+C0,H0,S2 - extended boot loader
 C0,H0,S3 - shell code
-C0,H0,S4 - syscall dispatcher
+C0,H0,S4 - shell code
+C0,H0,S5 - syscall dispatcher
 
 boot stages
 -----------
-boot.asm -> dispatch.asm (+fdsptch.c) -> head.asm -> init.c -> shell.c
+boot.asm -> dispatch.asm (+fdsptch.c) -> head.asm -> init.c -> shell.c -> stdio.c -> io.c
 
 
 filesystem FAT

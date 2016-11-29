@@ -32,7 +32,7 @@ loadblk:    mov  ah,0x02 ; Read Sectors From Drive service
 			jmp  loadsh
 
 ;data
-msg:		db	`starting real mode linux...\n\r`, 0
+msg:		db	`booting real mode linux...\r\n`, 0
 		    times  510 -($-$$) db 0
 			dw	   0xaa55
 
@@ -59,17 +59,18 @@ msg:		db	`starting real mode linux...\n\r`, 0
 
 			
 ; loading init + shell to memory
-loadsh:     mov  es,[shseg] ; second 64K segment
-			mov  ah,0x02 ; Read Sectors From Drive service
-			mov  al,0x02 ; number of sectors to read
-			mov	 ch,0x00 ; cylinder/track 
-			inc  cl      ; start from SECTOR 3
-			mov  dh,0x00 ; head
-			mov  dl,0x00 ; drive
+loadsh:     jmp loddsp
+;			mov  es,[shseg] ; second 64K segment
+;			mov  ah,0x02 ; Read Sectors From Drive service
+;			mov  al,0x02 ; number of sectors to read
+;			mov	 ch,0x00 ; cylinder/track 
+;			inc  cl      ; start from SECTOR 3
+;			mov  dh,0x00 ; head
+;			mov  dl,0x00 ; drive
 			;mov  bx,0x100 ; load to 100h as com files relocated to this address
-			mov  bx,0x0 ; load to 100h as com files relocated to this address
-			int  13h ; call BIOS to read sectors from floppy
-			add  bx,0x2200 ; 17x512=8704 in decimal and 2200 in hex
+;			mov  bx,0x0 ; load to 100h as com files relocated to this address
+			;int  13h ; call BIOS to read sectors from floppy
+			;add  bx,0x2200 ; 17x512=8704 in decimal and 2200 in hex
 			;mov  al,0x12 ; from now on number of sectors to read will be 18 as in 1.44MB disk
 
 ;lodnext:	inc  ch      ; move to the next cylinder
@@ -81,13 +82,13 @@ loadsh:     mov  es,[shseg] ; second 64K segment
 ;			add  bx,0x2400 ; 18x512=9216 in decimal and 2400 in hex
 ;			jmp  lodnext
 
-;loading syscall dispatcher + kernel to memory
+;loading kernel to memory
 loddsp:		mov  ah,0x02 ; Read Sectors From Drive service
-			mov  al,0x01
-			mov  cl,0x05    
+			mov  al,0x03 ; number of sectors
+			mov  cl,0x06 ; starting from sector
 			;mov  bx,0x100 ;  COM entry point
-			mov  bx,0x0 ;  COM entry point
-			mov  es,[dspseg] ; third 64K segment
+			mov  bx,0x0 ;  entry point
+			mov  es,[kernseg] ; third 64K segment
 			int  13h ; call BIOS to read sectors from floppy
 			
 ;start kernel			
@@ -99,6 +100,6 @@ init:		jmp  0x1000:0003h ;entry point for kernel
 
 ;msg2:		db  `error!`, 0
 shseg:		dw  SHSEG			
-dspseg:		dw  0x1000			
+kernseg:	dw  0x1000			
 			times 1024 - ($-$$) db 0
 			

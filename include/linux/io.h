@@ -1,4 +1,3 @@
-void cli();
-void sti();
 void call_int();
 void halt();
+void syscall(int service);

@@ -7,35 +7,54 @@ int shell() {
 	char *buf = "                                                                                                               ";
 	char in;
 	int i;
+	int j;
 	
-	sti();
 	while (1) {
+		//Prompt
 		printstr("\r\n");
 		printstr(a);
 		i=0;
+		//while character is not enter
 		while ((in = getchar()) != 13) {
+			//backspace but we are in the start of the prompt in the screen
 			if (in == 8 && i == 0) {
 				continue;
 			}
+			//backspace
 			if (in == 8) {
 				i--;
 				mputchar(in);
 				mputchar(' ');
 				mputchar(in);
 			}
+			//write the character in the screen 
 			else {
 				mputchar(in);
 				buf[i] = in;
-				i++;				
+				i++;
 			}
 			//ASCII 32 = whitespace
 			//ASCII 08 = backspace
-			//need to check if the key is backspace, need to decrease the buffer and clean the character from the screen
 		}
 		printstr("\r\n");
 		buf[i] = '\0';
 		if (strcmp(buf,"syscall") != -1) {
 			call_int();
+		}
+		else if (strcmp(buf,"aaa") != -1) {
+			_printstr("Hello kernel!");
+		}
+		else if (strcmp(buf,"bbb") != -1) {
+			_putchar('S');
+		}
+		else if (strcmp(buf,"ccc") != -1) {
+			for(j=0; j < 10; j++) {
+				buf[j]=_getchar();
+				_putchar(buf[j]);
+			}
+			buf[10]='\0';
+			_printstr("\r\n");
+			_printstr(buf);
 		}
 		else if (strcmp(buf,"halt") != -1) {
 			halt();

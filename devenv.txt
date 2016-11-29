@@ -1,0 +1,15 @@
+on windows
+----------
+
+1. install dosbox
+2. dosbox - mount directory with turbo c and turbo assembler (drive c) (add to dosbox configuration) 
+3. dosbox - also mount the rml code directory to dosbox (drive d)
+4. from here you can compile the kernel code without the boot loader.
+   the code is compiled with the linkbin.bat
+   d:
+   cd \obj
+   ..\LINKBIN.BAT
+5. linux machine on virtualbox with shared folder to rml code
+6. install build-essential and nasm packages to compile the boot loader.
+7. from here you can compile and prepare the floppy file.
+   just run make in the root directory of the code. 

@@ -6,16 +6,25 @@
 //typedef unsigned long size_t;
 
 void printstr(char *string) {
-	int i = 0;
+	
+	/*int i = 0;
 	while (string[i] != 0) {
 		mputchar(string[i]);
 		i++;
 	}
+	*/
+	
+	_printstr(string);
 }
 
 char getchar() {
-	char temp;
-	waitForKey:
+	//char temp;
+	
+	//temp = _getchar();
+	//return temp;
+	return _getchar();
+	
+	/*waitForKey:
 	asm {
 		mov ah,01h
 		int 16h
@@ -29,16 +38,21 @@ char getchar() {
 		int 16h
 		mov [temp],al
 	}
+	
 	return temp;
+	*/
 }
 
 void mputchar(char in) {
-	char temp = in;
+	/*char temp = in;
 	asm {
 		  mov ah,0Eh
 		  mov al,[temp]
 		  int 10h
 	}
+	*/
+	
+	_putchar(in);
 }
 
 int printf(const char *format, ...) {

@@ -1,41 +1,77 @@
-void cli() {
-	asm {
-		cli
-	}
-}
+#include "sysdef.h"
+#ifndef mystdio
+#include "mystdio.h"
+#define mystdio
+#endif
+#ifndef mystring
+#include "mystring.h"
+#define mystring
+#endif
 
-void sti() {
-	asm {
-		sti
-	}	
-}
+void syscall(int service);
 
-void call_int() {
+SYSCALL_PARAM sysparam;
+
+void syscall(int service) {
 	asm {
-		mov al,00h
+		mov bx,[service] //copying the value sitting in "service" address (pass by value)
+		mov dx,bx //copying the content of bx
+		mov si,offset sysparam;
 		int 80h
 	}
 }
 
+void _printstr(char *string) {
+	memcpy(string,sysparam.param,32);
+	syscall(0x04);
+}
+
+void _putchar(char in) {
+	sysparam.param[0] = in;
+	syscall(0x05);
+}
+
+char _getchar() {
+	syscall(0x06);
+	return sysparam.param[0];
+}
+
+void call_int() {
+	/*asm {
+		mov al,00h
+		int 80h
+	}
+	*/
+	syscall(0x00);
+}
+
 void halt() {
+	/*
 	asm {
 		mov al,01h
 		int 80h
 	}
+	*/
+	syscall(0x01);
 }
 
 void reboot() {
+	/*
 	asm {
 		mov al,02h
 		int 80h
 	}
+	*/
+	syscall(0x02);
 }
 
 void dispatch() {
-	asm {
+	/*asm {
 		mov al,05h
 		int 80h
-	}	
+	}
+	*/
+	syscall(0x05);
 }
 
 /*

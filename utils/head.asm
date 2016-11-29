@@ -26,5 +26,5 @@ init:	    sti
 			retf ; return far to the kernel segment
 
 extrn	_init:near
-msg		db	'loading init...',13,10,0
+msg		db	'starting init...',13,10,0
 END start

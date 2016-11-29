@@ -1,11 +1,32 @@
-void xload(char *name);
-void xrun(char *name);
+#include "sysdef.h"
+#ifndef MM
+#include "linux/mm.h"
+#define MM
+#endif
+
+int xload(char *name);
 void reboot();
 void halt();
 void uname();
 void set_ivt();
 void clear_scr();
 void run_init();
+void printstr(char *string);
+void _putchar(char in);
+char _getchar();
+void load_program(int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
+void cli();
+void sti();
+extern void farcall(int seg,int ofs);
+
+void startk() {
+	printstr("starting kernel...\r\n");
+	//xrun("shell");
+	//_dispatch();
+	init_seg();
+	set_ivt();
+	while (1) { run_init(); }
+}
 
 char _getchar() {
 	char temp;
@@ -26,6 +47,14 @@ char _getchar() {
 	return temp;
 }
 
+void printstr(char *string) {
+	int i = 0;
+	while (string[i] != 0) {
+		_putchar(string[i]);
+		i++;
+	}
+}
+
 void _putchar(char in) {
 	char temp = in;
 	asm {
@@ -35,12 +64,10 @@ void _putchar(char in) {
 	}
 }
 
-void _dispatch(char param) {
-	switch (param) {
+void _dispatch(int service,SYSCALL_PARAM *params) {
+	switch (service) {
 		case 0:
-			_putchar('a');
-			_putchar('b');
-			_putchar('c');
+			printstr("system call!\r\n");
 			break;
 		case 1:
 			halt();
@@ -49,8 +76,16 @@ void _dispatch(char param) {
 			reboot();
 			break;
 		case 3:
+			params->param[0] = _getchar();
 			break;
 		case 4:
+			printstr(params->param);
+			break;
+		case 5:
+			_putchar(params->param[0]);
+			break;
+		case 6:
+			params->param[0] = _getchar();
 			break;
 		default:
 			break;
@@ -73,36 +108,54 @@ void _dispatch(char param) {
 	return;
 }
 
-void startk() {
-	//xload("shell");
-	//xrun("shell");
-	//_dispatch();
-	set_ivt();
-	while (1) { run_init(); }
-	reboot();
-}
+int xload(char *name) {
+	//int segment = 0x2000;
+	int segment = get_free_seg();
+	int offset = 0x0000;
+	char num_sectors = 0x03;
+	char cylinder = 0x00;
+	char sector = 0x03;
+	char head = 0x00;
+	char drive = 0x00;
 
-void xload(char *name) {
-	int shseg = 2000;
-	//loading shell
+	//TODO: change to checking name param and decide by it what to load.
+	//if(1) {
+		//hard coded position of init program compiled with shell
+		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
+	//}
+		
+	/*
 	loadsh:
 	asm {
-		    mov  es,[shseg] 
-			mov  ah,0x02 
-			mov  al,0x02 
-			mov	 ch,0x00 
-			inc  cl      
-			mov  dh,0x00 
-			mov  dl,0x00 
-			mov  bx,0x100 
+		    mov  ah,0x02 //Read Sectors From Drive service
+			mov  al,0x02 //number of sectors to read
+			mov	 ch,0x00 // cylinder/track 
+			mov  cl,0x03 //start from SECTOR 3
+			mov  dh,0x00 //head 0
+			mov  dl,0x00 //drive
+			mov  bx,[shseg] //TODO - take the value from variable!!!
+			//mov  es,[shseg]  //second 64K segment (pass by value)
+			mov  es,bx  //second 64K segment (pass by value)
+			mov  bx,0x0  //load to 0h (binary file org 0 instead of com file)
 			int  13h 
 	}
+	*/
+	return segment;
 }
 
-void xrun(char *name) {
-	//asm {
-		//call  SHSEG:0100h
-	//}
+void load_program(int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive) {
+	asm {
+		mov  dl,[drive] //drive
+		mov	 ch,[cylinder] // cylinder/track 
+		mov  dh,[head] //head 0
+		mov  cl,[sector] 
+		mov  al,[num_sectors] //number of sectors to read
+		mov  bx,[segment]
+		mov  es,bx  //second 64K segment (pass by value)
+		mov  bx,[prog_offset] //load to 0h (binary file org 0 instead of com file) TODO: fix taking from offset param
+		mov  ah,0x02 //Read Sectors From Drive service
+		int  13h
+	}
 }
 
 void reboot() {
@@ -123,13 +176,19 @@ void uname() {
 
 void set_ivt() {
 	asm {
+			//first segment, where IVT is found
 			mov ax,0h
 			mov es,ax
 						
+			//offset where ISR is found (0h)
+			//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
+			//80h * 04h = 200h
+			//at the next two bytes (202h) resides the segment for the interupt handler
 			mov bx,200h
 			mov ax,0h
 			mov es:[bx],ax
 			
+			//segment where ISR is found (1000h - second segment)
 			mov bx,202h
 			mov ax,1000h
 			mov es:[bx],ax
@@ -153,12 +212,50 @@ void set_ivt() {
 }
 
 void run_init() {
-	asm {
-		db 9Ah // CALL FAR instruction
-		//db  0eah //JMP FAR instruction 
-		dw  0 //offset
-		dw  2000h //segment
+	int segment;
+	printstr("loading init...\r\n");
+	segment = xload("init");
+
+	if (segment == 0x2000) {
+		printstr("loaded to 0x2000\r\n");
 	}
+	else if (segment == 0x4000) {
+		printstr("loaded to 0x4000\r\n");
+	}
+	else if (segment == 0x5000) {
+		printstr("loaded to 0x5000\r\n");
+	}
+	
+	farcall(segment,0x0000);
+
+	/*
+	asm {
+				jmp myfar2
+	}
+	*/
+	
+	myfar:
+	asm {
+				db 9Ah // CALL FAR instruction
+			  //db  0eah //JMP FAR instruction 
+	}
+	ofs:
+	asm {
+				dw  0 //offset
+	}
+	segm:
+	asm {
+				dw  2000h //segment TODO:get it by parameter and not hard coded!
+	}
+	/*
+	myfar2:
+	asm {
+				mov ax,[segment]
+				mov [segm],ax
+				jmp myfar
+	}
+	*/
+	
 	//macro example
 	/*
 	FARCALL macro seg, ofs 
@@ -170,4 +267,16 @@ void run_init() {
 	FARCALL 0043h, 0130h 
 	*/
 	return;
+}
+
+void cli() {
+	asm {
+		cli
+	}
+}
+
+void sti() {
+	asm {
+		sti
+	}	
 }
