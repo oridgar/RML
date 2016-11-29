@@ -83,6 +83,9 @@ int shell() {
 		else if (strcmp(buf,"ls") != -1) {
 			run_program("ls");
 		}
+		else if (strcmp(buf,"ps") != -1) {
+			get_process_list();
+		}
 		else {
 			//TODO: call to run_program and get return code from the kernel
 			//by that to decide if to print the following message

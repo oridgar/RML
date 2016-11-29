@@ -69,13 +69,15 @@ void startk() {
 	init_seg();
 	set_ivt();
 	set_scheduler();
-	init_processes();
 	//sti();
 
 	mount("a");
 	sti();
 	//while (1) { run_init(); }
-	while (1) { run_program("init"); }
+	while (1) {
+		init_processes();
+		run_program("init");
+	}
 }
 
 //==============
@@ -153,6 +155,9 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			run_program(params->param);
 			set_running_proc(curr_pid);
 			break;
+		case 8:
+			get_process_list();
+			break;
 		default:
 			break;
 	}
@@ -202,7 +207,7 @@ unsigned int load(char *name,int *pid) {
 		//sector = 0x01;
 	}
 	//TODO: to be able to return another code that indicate that the program is not found!
-	register_proc(name,segment,segment,segment,offset,pid);
+	register_proc(name,segment,segment,segment,offset,pid,get_running_proc());
 	
 	return segment;
 }
@@ -302,8 +307,11 @@ void run_program(char *name) {
 	printstr("000");
 	printk(" pid: ");
 	printk(myitoa(pid));
+	printk(" ppid: ");
+	printk(myitoa(get_running_proc()));
 	printk("\r\n");
 	
+
 	//For now supporting only binary format. code origin is in 0x0000 or 0h
 	set_running_proc(pid);
 	farcall(segment,0x0000);

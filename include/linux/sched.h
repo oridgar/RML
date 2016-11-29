@@ -15,12 +15,13 @@ typedef struct {
 	unsigned int  ds;
 	unsigned int  cs;
 	unsigned int  ip;
+	unsigned int ppid;
 	procState state;
 } ProcessDesc;
 
 void schedule();
 void init_processes();
-int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid);
+int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid);
 int unregister_proc(int pid);
 
 #endif

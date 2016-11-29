@@ -21,5 +21,7 @@ int myclose(int fd);
 unsigned int myread(int fd, void *buf, unsigned int count);
 unsigned int mywrite(int fd, const void *buf, unsigned int count);
 unsigned int mylseek(int fildes, unsigned int offset, int whence);
+void get_process_list();
+int run_program(char *string);
 
 #endif

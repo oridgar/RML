@@ -28,7 +28,7 @@ int get_running_proc() {
 	return running_proc;
 }
 
-int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid) {
+int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid) {
 	int i;
 	for(i=0; i < NUM_PROCESSES; i++) {
 		if(processes[i].pid == 0) {
@@ -38,6 +38,8 @@ int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid) {
 			processes[i].ss = ss;
 			processes[i].state = READY;
 			processes[i].ip = entry_point;
+			processes[i].ppid = ppid;
+			strcpy(processes[i].name,name);
 			//copy also the name
 			*pid = processes[i].pid;
 			return processes[i].pid;
@@ -48,5 +50,23 @@ int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid) {
 
 int unregister_proc(int pid) {
 	processes[pid-1].pid = 0;
+	return 0;
+}
+
+int get_process_list() {
+	int i;
+	printk("pid ppid cs name\r\n");
+	for(i=0; i < NUM_PROCESSES; i++) {
+		if(processes[i].pid != 0) {
+			printk(myitoa(processes[i].pid));
+			printk(" ");
+			printk(myitoa(processes[i].ppid));
+			printk(" ");
+			printk(myitoa(processes[i].cs));
+			printk(" ");
+			printk(processes[i].name);
+			printk("\r\n");
+		}
+	}
 	return 0;
 }

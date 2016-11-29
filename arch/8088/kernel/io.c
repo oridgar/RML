@@ -139,6 +139,10 @@ int run_program(char *string) {
 	return sysparam.param[0];
 }
 
+void get_process_list() {
+	syscall(0x08);
+}
+
 
 //files
 

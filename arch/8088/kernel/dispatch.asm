@@ -188,6 +188,7 @@ sched:
 			;far jmp to bios int 8
 			;public _b_int8_seg
 			;public _b_int8_offs
+
 			db 0EAh ; JUMP FAR instruction
 			jmpf_ofs  dw 0
     		jmpf_segm dw 0h
