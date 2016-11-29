@@ -1,15 +1,15 @@
-#include "mystdio.h"
-#include "stdlib.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 void main() {
 	char string[13];
 	int i;
 	strcpy(string,"hello world!");
-	printstr(string);
+	printf(string);
 
 	for(i=0; i < 5; i++) {
 		string[i] = toupper(string[i]);
 	}
 
-	printstr(string);
+	printf(string);
 }

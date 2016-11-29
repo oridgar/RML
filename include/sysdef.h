@@ -1,9 +1,11 @@
 #ifndef _SYSDEF_H
 #define _SYSDEF_H
 
+#define SYSCALL_BUF_SIZE 576
+
 typedef struct 
 {
-  char param[512];
+  char param[SYSCALL_BUF_SIZE];
 }SYSCALL_PARAM ;
 
 typedef struct

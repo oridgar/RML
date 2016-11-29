@@ -1,5 +1,5 @@
-#include "mystring.h"
-#include "types.h"
+#include <string.h>
+#include <types.h>
 
 char *strcpy(char *dst, char *src) {
 	int i;

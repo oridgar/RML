@@ -1,7 +1,4 @@
-#ifndef MM
-#include "linux/mm.h"
-#define MM
-#endif
+#include <linux/mm.h>
 
 MEM_SEG seg_arr[NUM_SEG];
 
@@ -52,11 +49,11 @@ unsigned int get_free_seg() {
 
 unsigned int release_seg(unsigned int seg) {
 	int i;
-	char num;
+	//char num;
 	for (i=0; i < NUM_SEG; i++) {
 		
 		//printstr("checking segment number ");
-		num = '1' + i;
+		//num = '1' + i;
 		//_putchar(num);
 		//printstr("...");
 		if (seg_arr[i].address == seg) {

@@ -18,7 +18,7 @@
 #define PIC_EOI	0x20
 
 //KERNEL SERVICES - PUBLIC
-void reboot();
+//void reboot();
 void halt();
 void uname();
 int run_program(char *name); //run program = load + call
@@ -38,8 +38,8 @@ void set_ivt();
 //BIOS RELATED
 //void clear_scr();
 void printstr(char *string);
-void _putchar(char in);
-char _getchar();
+//void _putchar(char in);
+//char _getchar();
 void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive);
 void save_oldint8();
 

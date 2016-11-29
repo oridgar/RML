@@ -1,9 +1,10 @@
-#include "linux/kernio.h"
-#include "bios.h"
-#include "fs/fs.h"
+#include <linux/kernio.h>
+#include <bios.h>
+#include <fs/fs.h>
+#include <linux/sched.h>
+#include <string.h>
 
-FileDescriptor fd_list[5];
-
+FileDescriptor fd_list[5]; //For the kernel itself
 
 int lba_to_chs(off_t offset, char cylinders, char heads, char sectors, char *cylinder, char *head, char *sector) {
 	*sector = (offset / 512) % sectors + 1;
@@ -12,40 +13,87 @@ int lba_to_chs(off_t offset, char cylinders, char heads, char sectors, char *cyl
 	return 0;
 }
 
-int open(const char *pathname, int flags) {
-	if (strcmp(pathname,"/dev/fda") == 0) {
-		//strcpy(fd_list[3].pathname,"/dev/fda");
-		fd_list[3].pos = 0;
-		fd_list[3].pfd = -1;
-		fd_list[3].size = 65535;
+int open(const char *pathname, int flags,int pid) {
+//int open(const char *pathname, int flags) {
+	FileDescriptor *curr_fd_list;
+	int fd = -1;
 
-		return 3;
+	//TODO: change the file descriptor table from global wide to process wide
+	if (pid == 0) {
+		curr_fd_list = fd_list;
 	}
+	else {
+		curr_fd_list = processes[pid-1].files_table;
+	}
+
+	if (strcmp(pathname,"/dev/fda") == 0) {
+		fd = 3;
+		//strcpy(fd_list[3].pathname,"/dev/fda");
+		curr_fd_list[fd].pos = 0;
+		curr_fd_list[fd].pfd = -1;
+		curr_fd_list[fd].size = 65535;
+		//return 3;
+	}
+	//TODO: FIX THIS BUG!!!
+//	else if (strcmp(pathname,"/dev/stdin") == 0) {
+//		fd = 0;
+//		curr_fd_list[fd].pos = 0;
+//		curr_fd_list[fd].size = 0;
+//		curr_fd_list[fd].pfd = -1;
+//		curr_fd_list[fd].pfd_offset = 0;
+//		//return 0;
+//	}
+//	else if (strcmp(pathname,"/dev/stdout") == 0) {
+//		fd = 1;
+//		curr_fd_list[fd].pos = 0;
+//		curr_fd_list[fd].size = 0;
+//		curr_fd_list[fd].pfd = -1;
+//		curr_fd_list[fd].pfd_offset = 0;
+//		//return 0;
+//	}
+//	else if (strcmp(pathname,"/dev/stderr") == 0) {
+//		fd = 2;
+//		curr_fd_list[fd].pos = 0;
+//		curr_fd_list[fd].size = 0;
+//		curr_fd_list[fd].pfd = -1;
+//		curr_fd_list[fd].pfd_offset = 0;
+//		//return 0;
+//	}
 	else if (strcmp(pathname,"/dev/fdb") == 0) {
-		fd_list[4].pos = 0;
-		fd_list[4].pfd = -1;
-		fd_list[4].size = 65535;
-		return 4;
+		fd = 4;
+		curr_fd_list[fd].pos = 0;
+		curr_fd_list[fd].pfd = -1;
+		curr_fd_list[fd].size = 65535;
+		//return 4;
 	}
 	else if (strcmp(pathname,"/") == 0) {
-		fd_list[5].pos = 0;
-		fd_list[5].size = get_root_size();
-		fd_list[5].pfd = 4;
-		fd_list[5].pfd_offset = get_root_offset();
-		return 5;
+		fd = 5;
+		curr_fd_list[fd].pos = 0;
+		curr_fd_list[fd].size = get_root_size();
+		curr_fd_list[fd].pfd = 4;
+		curr_fd_list[fd].pfd_offset = get_root_offset();
+		//return 5;
 	}
-	return -1;
+	return fd;
 }
 
+//TODO: change to int close(int fd,int pid) {
 int close(int fd) {
+	fd_list[fd].pathname[0] = '\0';
+	fd_list[fd].pfd = 0;
+	fd_list[fd].pfd_offset = 0;
+	fd_list[fd].pos = 0;
+	fd_list[fd].size = 0;
 	return 0;
 }
 
+//TODO: change to off_t lseek(int fd, off_t offset, int whence,int pid)
 off_t lseek(int fd, off_t offset, int whence) {
 	fd_list[fd].pos = offset;
 	return offset;
 }
 
+//TODO: change to unsigned int read(int fd, void *buf, unsigned int count,int pid)
 unsigned int read(int fd, void *buf, unsigned int count) {
 	char cylinder;
 	char head;
@@ -60,6 +108,7 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	int  segment = 0x1000;
 	int  sector_offset;
 	char *new_buf;
+	int  i;
 
 	new_buf = (char *) buf;
 	//DEBUG
@@ -85,11 +134,13 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	}
 
 	//END DEBUG
+	//while there are device loops
 	if (fd_list[fd].pfd != -1) {
 		lseek(fd_list[fd].pfd,fd_list[fd].pfd_offset + fd_list[fd].pos,0);
 		read(fd_list[fd].pfd,new_buf,count);
 	}
-	else {
+	//the device is direct/hardware block/character device
+	else if (fd == 3 || fd == 4) {
 		if (fd == 3) {
 			drive = 0x00;
 			drive_num_cylinder = 80;
@@ -162,40 +213,67 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 			sector++;
 			sector_offset = 0;
 		}
-
-
+	}
+	else if (fd == 0) {
+		for(i=0;i < count; i++) {
+			((char *)buf)[i] = _getchar();
+		}
 	}
 	fd_list[fd].pos += count;
+	return 0;
+}
+
+int write(int fd, void *buf, unsigned int count,int pid) {
+	int i;
+	//char *msg = "write function!!!\r\n";
+
+	//while(*msg != '\0') {
+//		b_putchar(*msg);
+//		msg++;
+//	}
+
+	if (fd == 1 || fd == 2) {
+		for(i=0;i < count; i++) {
+			b_putchar(((char *)buf)[i]);
+		}
+		return count;
+	}
 	return 0;
 }
 
 
 void printk(char *string) {
 	int i = 0;
+	//TODO: FIX THIS BUG!!!
+	//strlen(string);
+	//write(1,string,strlen(string),0);
+
 	while (string[i] != 0) {
 		b_putchar(string[i]);
 		i++;
 	}
 }
 
-char *myitoa(unsigned int i) {
+char *uitoa(unsigned int i) {
 	static char  buf[5 + 2];
 	char *p = buf + 5 + 1;
-	if (i >= 0) {
+	//TODO: check that putting \0 to the end of buffer works
+	//p[6] = '\0';
+	//if (i >= 0) {
 		do {
 			*--p = '0' + (i % 10);
 			i /= 10;
 		} while (i != 0);
 		return p;
-	}
-	else {
-		do {
-			*--p = '0' - (i % 10);
-			i /= 10;
-		} while (i != 0);
-		*--p = '-';
-	}
-	return p;
+	//}
+//	else {
+//		do {
+//			*--p = '0' - (i % 10);
+//			i /= 10;
+//		} while (i != 0);
+//		*--p = '-';
+//	}
+//	return p;
 }
 
 int mount(char * filename) {
@@ -204,20 +282,23 @@ int mount(char * filename) {
     //char root_dir_content[7168];
     Fat16Entry file_list[256];
     Fat16Entry currfile;
-    int fd;
+    //int fd;
     int retcode;
 
-	//FILESYSTEM CODE
-    fd = open_drive();
+    if(strcmp(filename,"/dev/fdb") == 0) {
+		//FILESYSTEM CODE
+		//fd = open_drive();
+		open_drive();
 
-    //printk("reading boot sector\r\n");
-    read_boot_sector();
+		//printk("reading boot sector\r\n");
+		read_boot_sector();
 
-    //printk("reading fat\r\n");
-    read_fat(fat_table);
+		//printk("reading fat\r\n");
+		read_fat(fat_table);
 
-    //opening root filesystem
-    open("/",0);
+		//opening root filesystem
+		open("/",0,0);
+    }
 
     //printk("reading root directory content\r\n");
     //read_root_dir(root_dir_content);
@@ -230,7 +311,7 @@ int mount(char * filename) {
 
     //caching and listing all file metadatas
     //printk("get root files\r\n");
-    get_root_files(file_list);
+    //get_root_files(file_list);
 
 //    printk("after get_root_files \r\n");
 //    printk("file size:");
@@ -256,7 +337,7 @@ int mount(char * filename) {
 //	printk(myitoa(file_list[2].starting_cluster));
 //	printk("\r\n");
 
-    retcode = get_file(file_list,"FDSPTCH",&currfile);
+    //retcode = get_file(file_list,"FDSPTCH",&currfile);
 
 //    printk("after get_file \r\n");
 //    printk("file size:");
@@ -266,14 +347,14 @@ int mount(char * filename) {
 //    printk(myitoa(file_list[2].starting_cluster));
 //    printk("\r\n");
 
-    if (retcode == 0) {
-    	printk("printing file content of FDSPTCH:\r\n\r\n");
+    //if (retcode == 0) {
+    	//printk("printing file content of FDSPTCH:\r\n\r\n");
     	//printk(currfile.filename);
-    	print_file(&currfile);
-    }
-    else {
+    	//print_file(&currfile);
+    //}
+    //else {
     	//printk("file not found");
-    }
+    //}
 	//fclose(drv);
 
 	//END OF FILESYSTEM
@@ -311,6 +392,6 @@ cpy:
 	}
 }
 
-int getdents(unsigned int fd, linux_dirent *dirp, unsigned int count) {
-	return 0;
-}
+//int getdents(unsigned int fd, linux_dirent *dirp, unsigned int count) {
+	//return 0;
+//}

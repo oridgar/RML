@@ -1,8 +1,19 @@
-#include "ctype.h"
+#include <ctype.h>
 
 int tolower(int c) {
-	return ('a' + c - 'A');
+	if('A' <= c && c <= 'Z') {
+		return ('a' + c - 'A');
+	}
+	else {
+		return c;
+	}
 }
 int toupper(int c) {
-	return ('A' + c - 'a');
+
+	if('a' <= c && c <= 'z') {
+		return ('A' + c - 'a');
+	}
+	else {
+		return c;
+	}
 }

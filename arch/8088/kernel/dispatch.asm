@@ -4,7 +4,7 @@ ORG 0h
 
 global _farcall
 
-buf_size EQU 256
+buf_size EQU 288 ; in words, not bytes!
 
 ; INT 80h start points
 start: 		
@@ -107,7 +107,7 @@ cpy:		lodsw ; copy next word from user space to AX : LODSW (DS:SI -> AX) and SI+
 			
 			;saving data segment and buffer to return value
 			mov  ax,si
-			sub  ax,buf_size*2
+			sub  ax,buf_size*2 ;REWIND user buffer
 			push ax ;to use user parameters offset to return value
 			push [dsuser] ;to use user data segment to return value
 
@@ -279,7 +279,7 @@ public _b_int8_seg
 public _b_int8_offs
 
 ;msg		db	13,10,'system call!',13,10,0
-params		db 512 DUP(0)
+params		db buf_size*2 DUP(0)
 service		dw 0
 spbak		dw 0
 ssbak		dw 0

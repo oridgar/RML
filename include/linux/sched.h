@@ -1,11 +1,14 @@
 #ifndef _SCHED_H
 #define _SCHED_H
-
+#include <linux/kernio.h>
 #define NUM_PROCESSES 9
+#define NUM_FILES 5
+
 typedef enum {
 	READY,
 	WAIT,
-	RUNNING
+	RUNNING,
+	SLEEP
 } procState;
 
 typedef struct {
@@ -17,8 +20,10 @@ typedef struct {
 	unsigned int  ip;
 	unsigned int ppid;
 	procState state;
+	FileDescriptor files_table[NUM_FILES];
 } ProcessDesc;
 
+extern ProcessDesc processes[NUM_PROCESSES];
 void schedule();
 void init_processes();
 int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid);

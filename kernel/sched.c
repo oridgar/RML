@@ -1,5 +1,5 @@
-#include "linux\kernio.h"
-#include "linux\sched.h"
+#include <linux\kernio.h>
+#include <linux\sched.h>
 
 ProcessDesc processes[NUM_PROCESSES];
 int running_proc;
@@ -58,11 +58,11 @@ int get_process_list() {
 	printk("pid ppid cs name status\r\n");
 	for(i=0; i < NUM_PROCESSES; i++) {
 		if(processes[i].pid != 0) {
-			printk(myitoa(processes[i].pid));
+			printk(uitoa(processes[i].pid));
 			printk(" ");
-			printk(myitoa(processes[i].ppid));
+			printk(uitoa(processes[i].ppid));
 			printk(" ");
-			printk(myitoa(processes[i].cs));
+			printk(uitoa(processes[i].cs));
 			printk(" ");
 			printk(processes[i].name);
 			printk(" ");

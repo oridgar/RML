@@ -1,6 +1,6 @@
-#include "mystring.h"
-#include "fs/fs.h"
-#include "linux/kernio.h"
+#include <fs/fs.h>
+#include <string.h>
+#include <linux/kernio.h>
 
 
 //----------------
@@ -14,7 +14,7 @@ int drv;
 int open_drive() {
 	//FILL IN!
 	//drv = fopen("/cygdrive/d/Code/fatfs/fat.bin","ab+");
-	drv = open("/dev/fdb",0);
+	drv = open("/dev/fdb",0,0);
 	return drv;
 }
 
@@ -179,9 +179,8 @@ int list_root_files(int size) {
 	char name[9];
 	char ext[4];
 
-	// TODO: remove opening and seeking root folder and make sure get_root_next_file returns value that
-	// indicates there are no more files
-	fd = open("/",0);
+	// TODO: remove opening and seeking root folder and make sure get_root_next_file returns value that indicates there are no more files
+	fd = open("/",0,0);
 	lseek(fd,0,0);
 	// && sizeof(Fat16Entry)*files_read < size
 	for (i=0; i < bs.root_dir_entries; i++) {
@@ -225,7 +224,9 @@ int list_files(Fat16Entry *files) {
 	for(i=0; i < bs.root_dir_entries;i++) {
 		if (get_entry_type(&files[i]) == TYPE_FILE) {
 			//printf("\nentry file #%d: ",i + 1);
-			//printk("\r\nentry file #xxx: ");
+			//printk("\r\nentry file #");
+			//printk(myitoa(i + 1));
+			//printk(": ");
 			//deleted file
 			if (files[i].filename[0] == 0xe5) {
 				//printf("deleted (%s)\n",files[i].filename);
@@ -263,7 +264,7 @@ int print_file(Fat16Entry *file) {
 	unsigned int  curr_cluster;
 	unsigned int  next_cluster;
     char clust_buf[4097];
-    char nul = '\0';
+    //char nul = '\0';
 
 	//reading file content
 	curr_cluster=file->starting_cluster;
@@ -293,7 +294,7 @@ int load_file_content(Fat16Entry *file,unsigned int segment,unsigned int offset)
 	unsigned int  curr_cluster;
 	unsigned int  next_cluster;
     char clust_buf[4096];
-    char nul = '\0';
+    //char nul = '\0';
 
 	//reading file content
 	curr_cluster=file->starting_cluster;
@@ -304,7 +305,6 @@ int load_file_content(Fat16Entry *file,unsigned int segment,unsigned int offset)
 		//printk("\r\n");
 		//END DEBUG
 		read_cluster(clust_buf,curr_cluster);
-		//TODO: load the cluster into segment
 		load_to_memory(segment,offset,clust_buf,4096);
 		offset += sizeof(clust_buf);
 

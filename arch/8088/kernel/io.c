@@ -1,7 +1,7 @@
-#include "io.h"
-#include "sysdef.h"
-#include "mystdio.h"
-#include "mystring.h"
+#include <io.h>
+#include <stdio.h>
+#include <string.h>
+#include <sysdef.h>
 
 void syscall(int service);
 void _putchar(char in);
@@ -112,7 +112,7 @@ void reboot() {
 }
 
 void _printstr(char *string) {
-	memcpy(sysparam.param,string,512);
+	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
 	syscall(0x04);
 	//dprintstr(string);
 }
@@ -134,7 +134,7 @@ char _getchar() {
 }
 
 int run_program(char *string) {
-	memcpy(sysparam.param,string,512);
+	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
 	syscall(0x07);
 	return sysparam.param[0];
 }
@@ -147,8 +147,34 @@ void list_root_files() {
 	syscall(0x09);
 }
 
-
+//-----
 //files
+//-----
+
+int myopen(const char *pathname, int flags, unsigned int mode) {
+	syscall(10);
+	return 0;
+}
+int myclose(int fd) {
+	syscall(11);
+	return 0;
+}
+unsigned int mylseek(int fildes, unsigned int offset, int whence) {
+	syscall(12);
+	return 0;
+}
+
+unsigned int myread(int fd, void *buf, unsigned int count) {
+	syscall(13);
+	return 0;
+}
+
+unsigned int mywrite(int fd, const void *buf, unsigned int count) {
+	syscall(14);
+	return 0;
+}
+
+
 
 /*
 int myopen(const char *pathname, int flags, unsigned int mode) {

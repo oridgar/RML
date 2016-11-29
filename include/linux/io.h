@@ -3,17 +3,22 @@
 #ifndef _IO_H
 #define _IO_H
 
-#include "types.h"
+#include <types.h>
 
 void call_int();
 void halt();
 void syscall(int service);
+void reboot();
+void _printstr(char *string);
+void _putchar(char in);
+void dispatch();
+char _getchar();
 //returns file descriptor
 //int open(const char *pathname,int flags);
 int myopen(const char *pathname, int flags, unsigned int mode);
 //int open(const char *pathname, int flags, mode_t mode);
 //int creat(const char *pathname, mode_t mode);
-int mycreat(const char *pathname, unsigned int mode);
+//int mycreat(const char *pathname, unsigned int mode);
 int myclose(int fd);
 //ssize_t read(int fd, void *buf, size_t count);
 //ssize_t write(int fd, const void *buf, size_t count);
@@ -23,5 +28,6 @@ unsigned int mywrite(int fd, const void *buf, unsigned int count);
 unsigned int mylseek(int fildes, unsigned int offset, int whence);
 void get_process_list();
 int run_program(char *string);
+void list_root_files();
 
 #endif

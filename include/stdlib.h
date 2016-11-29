@@ -1,7 +1,7 @@
-#ifndef INCLUDE_STDLIB_H_
-#define INCLUDE_STDLIB_H_
+#ifndef _STDLIB_H
+#define _STDLIB_H
 
-char *itoa(unsigned int i);
+char *itoa(int i);
 
 
 #endif /* INCLUDE_STDLIB_H_ */

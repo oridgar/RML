@@ -1,12 +1,14 @@
-#include "sysdef.h"
-#include "linux/mm.h"
-#include "mystring.h"
-#include "fs/fs.h"
-#include "types.h"
-#include "bios.h"
-#include "linux/kernio.h"
-#include "linux/sched.h"
-#include "linux/kernel.h"
+#include <sysdef.h>
+#include <linux/mm.h>
+#include <fs/fs.h>
+#include <types.h>
+#include <bios.h>
+#include <linux/kernio.h>
+#include <linux/sched.h>
+#include <linux/kernel.h>
+#include <ctype.h>
+#include <string.h>
+#include <utils.h>
 
 extern void farcall(int seg,int ofs); //call the program
 extern int b_int8_seg;
@@ -14,29 +16,6 @@ extern int b_int8_offs;
 
 void printf(char *string) {
 	printstr(string);
-}
-
-//==============
-//BIOS FUNCTIONS
-//==============
-
-char _getchar() {
-	char temp;
-	waitForKey:
-	asm {
-		mov ah,01h
-		int 16h
-		jnz gotKey
-		jmp waitForKey
-	}
-
-	gotKey:
-	asm {
-		mov ah,00h
-		int 16h
-		mov [temp],al
-	}
-	return temp;
 }
 
 void printstr(char *string) {
@@ -47,24 +26,9 @@ void printstr(char *string) {
 	}
 }
 
-void _putchar(char in) {
-	char temp = in;
-	asm {
-		  mov ah,0Eh
-		  mov al,[temp]
-		  int 10h
-	}
-}
-
-//==================
-//END BIOS FUNCTIONS
-//==================
-
-void reboot() {
-	asm {
-		int 19h
-	}
-}
+//-------------------------
+//CPU INSTRUCTIONS WRAPPERS
+//-------------------------
 
 void halt() {
 	asm {
@@ -96,6 +60,10 @@ void outb(int port, char value) {
 	}
 }
 
+//-----------------------------
+//END CPU INSTRUCTIONS WRAPPERS
+//-----------------------------
+
 void startk() {
 	//--------------------
 	//Variable Declaration
@@ -111,7 +79,7 @@ void startk() {
 	set_scheduler();
 	//sti();
 
-	mount("a");
+	mount("/dev/fdb");
 	sti();
 	//while (1) { run_init(); }
 	while (1) {
@@ -124,9 +92,10 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 	int curr_pid;
 	int fd;
 
+	//printk("We're in dispatch\r\n");
 	switch (service) {
 		case 0:
-			printstr("system call!\r\n");
+			printk("system call!\r\n");
 			break;
 		case 1:
 			halt();
@@ -135,15 +104,20 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			reboot();
 			break;
 		case 3:
+			//TODO: change from _getchar() to read()
+			//read(0,params->param,1);
 			params->param[0] = _getchar();
 			break;
 		case 4:
-			printstr(params->param);
+			printk(params->param);
 			break;
 		case 5:
+			//TODO: change from _putchar() to write()
 			_putchar(params->param[0]);
 			break;
 		case 6:
+			//TODO: change from _getchar() to read()
+			//read(0,params->param,1);
 			params->param[0] = _getchar();
 			break;
 		case 7:
@@ -160,6 +134,23 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			//lseek(fd,0,0);
 			list_root_files(32);
 			break;
+		/*
+		case 10:
+			//open()
+			break;
+		case 11:
+			//close()
+			break;
+		case 12:
+			//seek()
+			break;
+		case 13:
+			//read()
+			break;
+		case 14:
+			//write()
+			break;
+		*/
 		default:
 			break;
 	}
@@ -178,74 +169,17 @@ unsigned int load(char *name,int *pid,unsigned int *seg) {
 	Fat16Entry currfile;
 	int retcode = 0;
 	
-	//replace it with get_file and get_file_content
-	if (strcmp(name,"init") == 0) {
-		get_root_files(file_list);
-		if (get_file(file_list,"INIT",&currfile) == -1) {
-			printk("could not find file!!!\r\n");
-		}
-		else {
-			load_file_content(&currfile,segment,offset);
-		}
-
-//		num_sectors = 0x12;
-//		drive = 0x00;
-//		cylinder = 0x00;
-//		head = 0x01;
-//		sector = 0x01;
-//		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
-	}
-	else if (strcmp(name,"shell") == 0) {
-		get_root_files(file_list);
-		if (get_file(file_list,"SHELL",&currfile) == -1) {
-			printk("could not find file!!!\r\n");
-		}
-		else {
-			load_file_content(&currfile,segment,offset);
-		}
-
-//		num_sectors = 0x12;
-//		drive = 0x00;
-//		cylinder = 0x01;
-//		head = 0x00;
-//		sector = 0x01;
-//		load_program(segment,offset,num_sectors,cylinder,sector,head,drive);
-	}
-	else if (strcmp(name,"ls") == 0) {
-		get_root_files(file_list);
-		if (get_file(file_list,"LS",&currfile) == -1) {
-			printk("could not find file!!!\r\n");
-		}
-		else {
-			load_file_content(&currfile,segment,offset);
-		}
-		//num_sectors = 0x12;
-		//drive = 0x00;
-		//cylinder = 0x01;
-		//head = 0x01;
-		//sector = 0x01;
-	}
-	else if (strcmp(name,"demo") == 0) {
-		get_root_files(file_list);
-		if (get_file(file_list,"DEMO",&currfile) == -1) {
-			printk("could not find file!!!\r\n");
-		}
-		else {
-			load_file_content(&currfile,segment,offset);
-		}
+	get_root_files(file_list);
+	stoupper(name);
+	if (get_file(file_list,name,&currfile) == -1) {
+		//printk("could not find file!!!\r\n");
+		retcode = 1;
 	}
 	else {
-		get_root_files(file_list);
-		if (get_file(file_list,name,&currfile) == -1) {
-			printk("could not find file!!!\r\n");
-			retcode = 1;
-		}
-		else {
-			load_file_content(&currfile,segment,offset);
-		}
+		load_file_content(&currfile,segment,offset);
 	}
+
 	if (retcode == 0) {
-		//TODO: to be able to return another code that indicate that the program is not found!
 		register_proc(name,segment,segment,segment,offset,pid,get_running_proc());
 	}
 	
@@ -263,7 +197,7 @@ void load_program(unsigned int segment,int prog_offset, char num_sectors,char cy
 		mov  al,[num_sectors] //number of sectors to read
 		mov  bx,[segment]
 		mov  es,bx  //second 64K segment (pass by value)
-		mov  bx,[prog_offset] //load to 0h (binary file org 0 instead of com file) TODO: fix taking from offset param
+		mov  bx,[prog_offset] //load to prog_offset from segment
 		mov  ah,0x02 //Read Sectors From Drive service
 		int  13h
 	}
@@ -315,7 +249,7 @@ void set_ivt() {
 //calling farcall to run the program
 int run_program(char *name) {
 	unsigned int segment;
-	char seg_prefix;
+	//char seg_prefix;
 	int pid;
 	int retcode;
 
@@ -328,7 +262,7 @@ int run_program(char *name) {
 
 	if (retcode == 0) {
 		//printstr("loaded to 0x");
-		seg_prefix = '0' + (segment / 0x1000);
+		//seg_prefix = '0' + (segment / 0x1000);
 		//_putchar(seg_prefix);
 	//	printstr("000");
 	//	printk(" pid: ");

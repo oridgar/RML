@@ -1,7 +1,7 @@
-#include "mystdio.h"
-#include "mystring.h"
-#include "linux\io.h"
-#include "stdlib.h"
+#include <linux\io.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 void main() {
 	shell();
@@ -10,7 +10,6 @@ void main() {
 
 int shell() {
 	char *a = "# ";
-	//char *buf = "                                                                                                               ";
 	char buf[50];
 	char in;
 	int i;
@@ -19,8 +18,8 @@ int shell() {
 	
 	while (1) {
 		//Prompt
-		printstr("\r\n");
-		printstr(a);
+		printf("\r\n");
+		printf(a);
 		i=0;
 		//while character is not enter
 		while ((in = getchar()) != 13) {
@@ -31,20 +30,20 @@ int shell() {
 			//backspace
 			if (in == 8) {
 				i--;
-				mputchar(in);
-				mputchar(' ');
-				mputchar(in);
+				putchar(in);
+				putchar(' ');
+				putchar(in);
 			}
 			//write the character in the screen 
 			else {
-				mputchar(in);
+				putchar(in);
 				buf[i] = in;
 				i++;
 			}
 			//ASCII 32 = whitespace
 			//ASCII 08 = backspace
 		}
-		printstr("\r\n");
+		printf("\r\n");
 		buf[i] = '\0';
 		if (strcmp(buf,"syscall") != -1) {
 			call_int();
@@ -76,31 +75,14 @@ int shell() {
 		else if (strcmp(buf,"dispatch") != -1) {
 			dispatch();
 		}
-		else if (strcmp(buf,"shell") != -1) {
-			run_program("shell");
-		}
-		else if (strcmp(buf,"init") != -1) {
-			run_program("init");
-		}
-		else if (strcmp(buf,"ls") != -1) {
-			run_program("ls");
-		}
 		else if (strcmp(buf,"ps") != -1) {
 			get_process_list();
 		}
-		else if (strcmp(buf,"demo") != -1) {
-			retcode = run_program("demo");
-			printstr("\r\nreturn code: ");
-			mputchar('0' + retcode);
-			printstr("\r\n");
-
-		}
 		else {
-			//TODO: call to run_program and get return code from the kernel
-			//by that to decide if to print the following message
+			//TODO: change run_program to system()
 			if (run_program(buf)) {
-				printstr(buf);
-				printstr(": command not found");
+				printf(buf);
+				printf(": command not found");
 			}
 		}
 	}

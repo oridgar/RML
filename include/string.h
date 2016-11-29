@@ -1,6 +1,7 @@
 #ifndef _STRING_H
 #define _STRING_H
-#include "types.h"
+#include <types.h>
+
 
 char *strcpy(char *dst, char *src);
 char *strncpy(char *dst,char *src,unsigned int n);

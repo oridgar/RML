@@ -1,9 +1,10 @@
-#include "stdlib.h"
+#include <stdlib.h>
 
 
-char *itoa(unsigned int i) {
+char *itoa(int i) {
 	static char  buf[5 + 2];
 	char *p = buf + 5 + 1;
+	buf[6]='\0';
 	if (i >= 0) {
 		do {
 			*--p = '0' + (i % 10);
