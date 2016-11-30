@@ -13,6 +13,7 @@ typedef struct
   int fd;
   unsigned int count;
   char buf[508];
+  char pad[64];
 }SYSCALL_FILEIO;
 
 #endif

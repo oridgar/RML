@@ -11,6 +11,7 @@ The hardware it based on:
 We will use BIOS as our device driver to make it easier to build the Operating System.
 
 Tools used:
+
 1. Text editor such as Notepad++ / eclipse-cdt **(recommended)**
 2. Borland tools (turbo C, turbo assembler, turbo linker)
 3. NASM (for compiling the boot loader)

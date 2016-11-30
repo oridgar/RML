@@ -19,14 +19,16 @@ typedef struct {
 	unsigned int  cs;
 	unsigned int  ip;
 	unsigned int ppid;
+	unsigned long size;
 	procState state;
 	FileDescriptor files_table[NUM_FILES];
+
 } ProcessDesc;
 
 extern ProcessDesc processes[NUM_PROCESSES];
 void schedule();
 void init_processes();
-int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid);
+register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid,unsigned long size);
 int unregister_proc(int pid);
 
 #endif

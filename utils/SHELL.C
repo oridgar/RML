@@ -45,16 +45,16 @@ int shell() {
 		}
 		printf("\r\n");
 		buf[i] = '\0';
-		if (strcmp(buf,"syscall") != -1) {
+		if (strcmp(buf,"syscall") == 0) {
 			call_int();
 		}
-		else if (strcmp(buf,"aaa") != -1) {
+		else if (strcmp(buf,"aaa") == 0) {
 			_printstr("Hello kernel!");
 		}
-		else if (strcmp(buf,"bbb") != -1) {
+		else if (strcmp(buf,"bbb") == 0) {
 			_putchar('S');
 		}
-		else if (strcmp(buf,"ccc") != -1) {
+		else if (strcmp(buf,"ccc") == 0) {
 			for(j=0; j < 10; j++) {
 				buf[j]=_getchar();
 				_putchar(buf[j]);
@@ -63,19 +63,19 @@ int shell() {
 			_printstr("\r\n");
 			_printstr(buf);
 		}
-		else if (strcmp(buf,"halt") != -1) {
+		else if (strcmp(buf,"halt") == 0) {
 			halt();
 		}
-		else if (strcmp(buf,"reboot") != -1) {
+		else if (strcmp(buf,"reboot") == 0) {
 			reboot();
 		}
-		else if (strcmp(buf,"exit") != -1) {
+		else if (strcmp(buf,"exit") == 0) {
 			break;
 		}
-		else if (strcmp(buf,"dispatch") != -1) {
+		else if (strcmp(buf,"dispatch") == 0) {
 			dispatch();
 		}
-		else if (strcmp(buf,"ps") != -1) {
+		else if (strcmp(buf,"ps") == 0) {
 			get_process_list();
 		}
 		else {

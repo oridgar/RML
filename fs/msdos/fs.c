@@ -34,7 +34,6 @@ int read_boot_sector() {
     return 0;
 }
 
-
 void print_fs_params() {
 
 }
@@ -86,9 +85,9 @@ int read_cluster(char *buffer,unsigned int cluster_num) {
 
 	seek_pos = s_pos.data_section_start + (cluster_size * (cluster_num - 2));
 	//DEBUG
-	//printk("seek pos:");
-	//printk(myitoa(seek_pos));
-	//printk("\r\n");
+//	printk("seek pos:");
+//	printk(uitoa(seek_pos));
+//	printk("\r\n");
 	//END DEBUG
 	lseek(4,seek_pos, 0);
 	read(4,buffer, cluster_size);
@@ -170,14 +169,21 @@ int get_root_next_file(Fat16Entry *file) {
 	return 0;
 }
 
-int list_root_files(int size) {
+int list_root_files(int size,file_out_format out_format) {
 	int i;
+	int j;
 	int fd;
 	int files_read = 0;
 	Fat16Entry file;
 	fileAttrib attrib;
 	char name[9];
 	char ext[4];
+	char day;
+	char month;
+	unsigned int year;
+	char seconds;
+	char minutes;
+	char hours;
 
 	// TODO: remove opening and seeking root folder and make sure get_root_next_file returns value that indicates there are no more files
 	fd = open("/",0,0);
@@ -196,13 +202,111 @@ int list_root_files(int size) {
 			}
 			else {
 				extract_file_name(&file,name,ext);
-				printk(name);
-				printk(".");
-				printk(ext);
-				printk("   ");
+
+				switch (out_format) {
+				case FILE_OUT_WIDE:
+					printk(name);
+					printk(".");
+					printk(ext);
+					printk(" ");
+					printk("   ");
+					break;
+				case FILE_OUT_LIST:
+					file_attrib(&file,&attrib);
+
+					if (attrib.subdirectory) {
+						printk("d");
+					}
+					else {
+						printk("-");
+					}
+
+					for(j=0; j < 3; j++) {
+						printk("r");
+						if (attrib.read_only) {
+							printk("-");
+						}
+						else {
+							printk("w");
+						}
+						printk("x");
+					}
+
+					printk(" root root ");
+					printk(uitoa(file.file_size));
+					printk(" ");
+
+					day = file.modify_date & 0x001F;
+					month = (file.modify_date & 0x01E0) >> 5;
+					year = ((file.modify_date & 0xFE00) >> 9) + 1980;
+
+					switch ((unsigned int)month) {
+						case 1:
+							printk("Jan");
+							break;
+						case 2:
+							printk("Feb");
+							break;
+						case 3:
+							printk("Mar");
+							break;
+						case 4:
+							printk("Apr");
+							break;
+						case 5:
+							printk("May");
+							break;
+						case 6:
+							printk("Jun");
+							break;
+						case 7:
+							printk("Jul");
+							break;
+						case 8:
+							printk("Aug");
+							break;
+						case 9:
+							printk("Sep");
+							break;
+						case 10:
+							printk("Oct");
+							break;
+						case 11:
+							printk("Nov");
+							break;
+						case 12:
+							printk("Dec");
+							break;
+						default:
+							printk("   ");
+					}
+					//printk(uitoa((unsigned int)month));
+					printk(" ");
+					printk(uitoa((unsigned int)day));
+					printk(" ");
+					//TODO: get the current date and if the files created in the same date, only then show the time
+					seconds = (file.modify_time & 0x001F) * 2;
+					minutes = (file.modify_time & 0x07E0) >> 5;
+					hours = (file.modify_time & 0xF800) >> 11;
+					printk(uitoa((unsigned int)hours));
+					printk(":");
+					printk(uitoa((unsigned int)minutes));
+					//printk(":");
+					//printk(uitoa((unsigned int)seconds));
+
+					//printk(uitoa((unsigned int)year));
+					printk(" ");
+					//printk("Xxx ");
+					//printk("xx ");
+					//printk("xx:xx ");
+					printk(name);
+					printk(".");
+					printk(ext);
+					printk("\r\n");
+					break;
+				}
 				files_read++;
 			}
-			file_attrib(&file,&attrib);
 			//print_file_attrib(&files[i],&attrib);
 		}
 
@@ -300,9 +404,9 @@ int load_file_content(Fat16Entry *file,unsigned int segment,unsigned int offset)
 	curr_cluster=file->starting_cluster;
 	do {
 		//DEBUG
-		//printk("\r\ncurrent cluster: ");
-		//printk(myitoa(curr_cluster));
-		//printk("\r\n");
+//		printk("\r\ncurrent cluster: ");
+//		printk(uitoa(curr_cluster));
+//		printk("\r\n");
 		//END DEBUG
 		read_cluster(clust_buf,curr_cluster);
 		load_to_memory(segment,offset,clust_buf,4096);

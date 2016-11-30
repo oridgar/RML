@@ -20,8 +20,9 @@ all:
 	@echo creating filesystem disk and copying all user space applications
 	mkfs.fat -n TEST1 -s 8 -S 512 -f 1 -F 12 ./obj/fat.img
 	mount ./obj/fat.img /mnt
-	cp ./obj/LS.BIN /mnt/LS.BIN
-	cp ./obj/INIT.BIN /mnt/INIT.BIN
-	cp ./obj/SHELL.BIN /mnt/SHELL.BIN
-	cp ./obj/DEMO.BIN /mnt/DEMO.BIN
+	cp ./obj/*.BIN /mnt
+	#cp ./obj/LS.BIN /mnt/LS.BIN
+	#cp ./obj/INIT.BIN /mnt/INIT.BIN
+	#cp ./obj/SHELL.BIN /mnt/SHELL.BIN
+	#cp ./obj/DEMO.BIN /mnt/DEMO.BIN
 	umount /mnt

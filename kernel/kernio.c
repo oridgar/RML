@@ -6,7 +6,7 @@
 
 FileDescriptor fd_list[5]; //For the kernel itself
 
-int lba_to_chs(off_t offset, char cylinders, char heads, char sectors, char *cylinder, char *head, char *sector) {
+int lba_to_chs(unsigned int offset, unsigned char cylinders, unsigned char heads, unsigned char sectors, unsigned char *cylinder, unsigned char *head, unsigned char *sector) {
 	*sector = (offset / 512) % sectors + 1;
 	*head = ((offset / 512) + 1) / sectors % heads;
 	*cylinder = ((offset / 512)) / (sectors * heads);
@@ -95,18 +95,18 @@ off_t lseek(int fd, off_t offset, int whence) {
 
 //TODO: change to unsigned int read(int fd, void *buf, unsigned int count,int pid)
 unsigned int read(int fd, void *buf, unsigned int count) {
-	char cylinder;
-	char head;
-	char sector;
-	int  num_sectors;
-	int  num_bytes;
+	unsigned char cylinder;
+	unsigned char head;
+	unsigned char sector;
+	unsigned int  num_sectors;
+	unsigned int  num_bytes;
 	char drive;
 	char drive_num_cylinder;
 	char drive_num_heads;
 	char drive_num_sectors;
 	char sector_buf[512];
 	int  segment = 0x1000;
-	int  sector_offset;
+	unsigned int  sector_offset;
 	char *new_buf;
 	int  i;
 
@@ -158,15 +158,28 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 
 		//converting lba to chs
 		lba_to_chs(fd_list[fd].pos,drive_num_cylinder,drive_num_heads,drive_num_sectors,&cylinder,&head,&sector);
+//		printk("starting cylinder: ");
+//		printk(uitoa((unsigned int)cylinder));
+//		printk(" starting head: ");
+//		printk(uitoa((unsigned int)head));
+//		printk(" starting sector: ");
+//		printk(uitoa((unsigned int)sector));
+//		printk("\r\n");
 		if (count == 0) {
 			num_sectors = 0;
 		}
 		else {
 			num_sectors = (count - 1) / 512 + 1;
 		}
+//		printk("num_sectors = ");
+//		printk(uitoa(num_sectors));
 		num_bytes = count;
+//		printk(" num_bytes = ");
+//		printk(uitoa(num_bytes));
 		sector_offset = fd_list[fd].pos % 512;
-
+//		printk(" sector_offset = ");
+//		printk(uitoa(num_bytes));
+//		printk("\r\n");
 		//each iteration, reading from current cylinder and head
 		while (num_sectors > 0) {
 			//moves to the next head
@@ -180,17 +193,19 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 				//num_sectors -= 18 - sector + 1; //decrement number of sectors read already
 			}
 			//DEBUG
-	//		printk("reading cylinder: ");
-	//		printk(myitoa((int)cylinder));
-	//		printk(" head: ");
-	//		printk(myitoa((int)head));
-	//		printk(" sector: ");
-	//		printk(myitoa((int)sector));
+//			printk("reading cylinder: ");
+//			printk(uitoa((unsigned int)cylinder));
+//			printk(" head: ");
+//			printk(uitoa((unsigned int)head));
+//			printk(" sector: ");
+//			printk(uitoa((unsigned int)sector));
+//			printk("\r\n");
 
 			//END DEBUG
 			//reading into kernel segment
 			if (read_sectors(segment,(int)sector_buf, 1 ,cylinder,sector, head, drive)) {
 				printk("error reading sectors!\r\n");
+				halt();
 			}
 
 	//		printk(" to address:");
@@ -249,7 +264,8 @@ void printk(char *string) {
 	//write(1,string,strlen(string),0);
 
 	while (string[i] != 0) {
-		b_putchar(string[i]);
+		//b_putchar(string[i]);
+		_putchar(string[i]);
 		i++;
 	}
 }

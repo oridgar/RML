@@ -8,9 +8,9 @@ del result.txt
 
 rem creating object file from ASM code which will initiate C code
 tasm  d:\utils\head.asm >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 tasm  d:\arch\8088\kernel\dispatch.asm >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 rem creating object file from C code
 tcc -Id:\include -mt -S d:\lib\stdlib.c d:\lib\ctype.c d:\lib\utils.c
 tcc -Id:\include -mt -S d:\utils\shell.c d:\lib\string.c d:\lib\stdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c 
@@ -18,10 +18,10 @@ tcc -Id:\include -mt -c d:\lib\stdlib.c d:\lib\ctype.c d:\lib\utils.c >> result.
 tcc -Id:\include -mt -c d:\utils\shell.c d:\lib\string.c d:\lib\stdio.c d:\arch\8088\kernel\io.c d:\init\init.c d:\utils\ls.c >> result.txt 
 
 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 tcc -Id:\include -mt -S d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c
 tcc -Id:\include -mt -c d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 
 rem FILE SYSTEM
 rem ------------------------------------
@@ -58,25 +58,25 @@ rem at the end there is comma and after that the name of the output file. THIS I
 rem THE CODE IS NOT STARTED AT ORIGIN 100h.
 rem also dispatch.obj must be first as it is an assembly code with entry point and the linker demands that the first file will includes entry point
 tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj bios.obj kernio.obj fs.obj string.obj ctype.obj utils.obj,kernel.bin >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 
 echo ////////////
 echo linking init
 echo ////////////
 tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\init.obj,init.bin >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 
 echo /////////////
 echo linking shell
 echo /////////////
 tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\shell.obj,shell.bin >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 
 echo //////////
 echo linking ls
 echo //////////
 tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ls.obj,ls.bin >> result.txt 
-IF ERRORLEVEL 1 pause
+rem IF ERRORLEVEL 1 pause
 
 echo /////////////////
 echo full compile demo

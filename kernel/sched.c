@@ -19,7 +19,10 @@ void init_processes() {
 }
 
 void set_running_proc(int pid) {
-	processes[running_proc -1].state = READY;
+	//TODO: put the process data in the same index as pid (index == pid)
+	if (running_proc != 0) {
+		processes[running_proc -1].state = READY;
+	}
 	running_proc = pid;
 	processes[pid-1].state = RUNNING;
 }
@@ -28,7 +31,7 @@ int get_running_proc() {
 	return running_proc;
 }
 
-int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid) {
+int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,int ppid,unsigned long size) {
 	int i;
 	for(i=0; i < NUM_PROCESSES; i++) {
 		if(processes[i].pid == 0) {
@@ -39,6 +42,7 @@ int register_proc(char *name, int cs, int ds, int ss,int entry_point,int *pid,in
 			processes[i].state = READY;
 			processes[i].ip = entry_point;
 			processes[i].ppid = ppid;
+			processes[i].size = size;
 			strcpy(processes[i].name,name);
 			//copy also the name
 			*pid = processes[i].pid;
@@ -55,7 +59,7 @@ int unregister_proc(int pid) {
 
 int get_process_list() {
 	int i;
-	printk("pid ppid cs name status\r\n");
+	printk("pid ppid cs name status size\r\n");
 	for(i=0; i < NUM_PROCESSES; i++) {
 		if(processes[i].pid != 0) {
 			printk(uitoa(processes[i].pid));
@@ -79,6 +83,8 @@ int get_process_list() {
 			default:
 				printk("UNKNOWN");
 			}
+			printk(" ");
+			printk(uitoa(processes[i].size));
 			printk("\r\n");
 		}
 	}

@@ -132,7 +132,7 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 		case 9:
 			//fd = open("/",0);
 			//lseek(fd,0,0);
-			list_root_files(32);
+			list_root_files(32,FILE_OUT_LIST);
 			break;
 		/*
 		case 10:
@@ -176,11 +176,15 @@ unsigned int load(char *name,int *pid,unsigned int *seg) {
 		retcode = 1;
 	}
 	else {
+		//printk("calling load_file_content\r\n");
+		//printk("starting cluster: ");
+		//printk(uitoa(currfile.starting_cluster));
+		//printk("\r\n");
 		load_file_content(&currfile,segment,offset);
 	}
 
 	if (retcode == 0) {
-		register_proc(name,segment,segment,segment,offset,pid,get_running_proc());
+		register_proc(name,segment,segment,segment,offset,pid,get_running_proc(),currfile.file_size);
 	}
 	
 	*seg = segment;
@@ -253,9 +257,9 @@ int run_program(char *name) {
 	int pid;
 	int retcode;
 
-	//printstr("loading ");
-	//printstr(name);
-	//printstr("...\r\n");
+//	printk("loading ");
+//	printk(name);
+//	printk("...\r\n");
 
 	//segment = load(name,&pid);
 	retcode = load(name,&pid,&segment);
@@ -273,6 +277,7 @@ int run_program(char *name) {
 
 
 		//For now supporting only binary format. code origin is in 0x0000 or 0h
+		//printk("set_running_proc\r\n");
 		set_running_proc(pid);
 		farcall(segment,0x0000);
 	

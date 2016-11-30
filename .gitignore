@@ -7,3 +7,6 @@ test
 .settings
 .cproject
 .project
+cygwin_vars.sh
+unattndc.sh
+Debug

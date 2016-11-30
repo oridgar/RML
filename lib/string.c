@@ -27,22 +27,27 @@ char *strncpy(char *dst,char *src,unsigned int n) {
 
 int strcmp(char *src,char *dst) {
 	//change return values and shell code associated with it!
-	int i=0;
-	int ret=-1;
+	//int i=0;
+	//int ret=-1;
 
-	while (src[i] !=0 && dst[i] !=0 && src[i] == dst[i]) {
-		i++;
-	}
-	if (src[i] == dst[i]) {
-		ret=0;
-	}
-	else if (src[i] == 0) {
-		ret = -1;
-	}
-	else if (dst[i] == 0) {
-		ret = 1;
-	}
-	return ret;
+	for ( ; *src == *dst; src++, dst++)
+		if (*src == '\0')
+			return 0;
+	return ((*(unsigned char *)src < *(unsigned char *)dst) ? -1 : 1);
+
+//	while (src[i] !=0 && dst[i] !=0 && src[i] == dst[i]) {
+//		i++;
+//	}
+//	if (src[i] == dst[i]) {
+//		ret=0;
+//	}
+//	else if (src[i] == 0) {
+//		ret = -1;
+//	}
+//	else if (dst[i] == 0) {
+//		ret = 1;
+//	}
+//	return ret;
 }
 
 

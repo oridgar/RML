@@ -4,7 +4,7 @@
 
 typedef struct {
 	char pathname[32];
-	int pos;
+	unsigned int pos;
 	unsigned int size;
 	int pfd;
 	int pfd_offset;
@@ -16,7 +16,7 @@ typedef struct {
 	long size;
 } linux_dirent;
 
-int lba_to_chs(off_t offset, char cylinders, char heads, char sectors, char *cylinder, char *head, char *sector);
+int lba_to_chs(unsigned int offset, unsigned char cylinders, unsigned char heads, unsigned char sectors, unsigned char *cylinder, unsigned char *head, unsigned char *sector);
 //int open(const char *pathname, int flags);
 int open(const char *pathname, int flags,int pid);
 int close(int fd);
