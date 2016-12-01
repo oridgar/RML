@@ -72,12 +72,6 @@ int shell() {
 		else if (strcmp(buf,"exit") == 0) {
 			break;
 		}
-		else if (strcmp(buf,"dispatch") == 0) {
-			dispatch();
-		}
-		else if (strcmp(buf,"ps") == 0) {
-			get_process_list();
-		}
 		else {
 			//TODO: change run_program to system()
 			if (run_program(buf)) {

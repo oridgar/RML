@@ -33,7 +33,7 @@ int read_sectors(unsigned int segment,int buf_offset, char num_sectors,char cyli
 //BIOS FUNCTIONS
 //==============
 
-char _getchar() {
+char b_getchar() {
 	char temp;
 	waitForKey:
 	asm {
@@ -50,15 +50,6 @@ char _getchar() {
 		mov [temp],al
 	}
 	return temp;
-}
-
-void _putchar(char in) {
-	char temp = in;
-	asm {
-		  mov ah,0Eh
-		  mov al,[temp]
-		  int 10h
-	}
 }
 
 void reboot() {

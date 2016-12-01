@@ -6,10 +6,10 @@
 
 FileDescriptor fd_list[5]; //For the kernel itself
 
-int lba_to_chs(unsigned int offset, unsigned char cylinders, unsigned char heads, unsigned char sectors, unsigned char *cylinder, unsigned char *head, unsigned char *sector) {
-	*sector = (offset / 512) % sectors + 1;
-	*head = ((offset / 512) + 1) / sectors % heads;
-	*cylinder = ((offset / 512)) / (sectors * heads);
+int lba_to_chs(unsigned int lba, unsigned char cylinders, unsigned char heads, unsigned char sectors, unsigned char *cylinder, unsigned char *head, unsigned char *sector) {
+	*sector = lba % sectors + 1;
+	*head = (lba + 1) / sectors % heads;
+	*cylinder = (lba) / (sectors * heads);
 	return 0;
 }
 
@@ -35,22 +35,22 @@ int open(const char *pathname, int flags,int pid) {
 		//return 3;
 	}
 	//TODO: FIX THIS BUG!!!
-//	else if (strcmp(pathname,"/dev/stdin") == 0) {
-//		fd = 0;
-//		curr_fd_list[fd].pos = 0;
-//		curr_fd_list[fd].size = 0;
-//		curr_fd_list[fd].pfd = -1;
-//		curr_fd_list[fd].pfd_offset = 0;
-//		//return 0;
-//	}
-//	else if (strcmp(pathname,"/dev/stdout") == 0) {
-//		fd = 1;
-//		curr_fd_list[fd].pos = 0;
-//		curr_fd_list[fd].size = 0;
-//		curr_fd_list[fd].pfd = -1;
-//		curr_fd_list[fd].pfd_offset = 0;
-//		//return 0;
-//	}
+	else if (strcmp(pathname,"/dev/stdin") == 0) {
+		fd = 0;
+		curr_fd_list[fd].pos = 0;
+		curr_fd_list[fd].size = 0;
+		curr_fd_list[fd].pfd = -1;
+		curr_fd_list[fd].pfd_offset = 0;
+		//return 0;
+	}
+	else if (strcmp(pathname,"/dev/stdout") == 0) {
+		fd = 1;
+		curr_fd_list[fd].pos = 0;
+		curr_fd_list[fd].size = 0;
+		curr_fd_list[fd].pfd = -1;
+		curr_fd_list[fd].pfd_offset = 0;
+		//return 0;
+	}
 //	else if (strcmp(pathname,"/dev/stderr") == 0) {
 //		fd = 2;
 //		curr_fd_list[fd].pos = 0;
@@ -109,6 +109,7 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	unsigned int  sector_offset;
 	char *new_buf;
 	int  i;
+	int bytes_read;
 
 	new_buf = (char *) buf;
 	//DEBUG
@@ -137,7 +138,7 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	//while there are device loops
 	if (fd_list[fd].pfd != -1) {
 		lseek(fd_list[fd].pfd,fd_list[fd].pfd_offset + fd_list[fd].pos,0);
-		read(fd_list[fd].pfd,new_buf,count);
+		bytes_read = read(fd_list[fd].pfd,new_buf,count);
 	}
 	//the device is direct/hardware block/character device
 	else if (fd == 3 || fd == 4) {
@@ -157,7 +158,7 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 		}
 
 		//converting lba to chs
-		lba_to_chs(fd_list[fd].pos,drive_num_cylinder,drive_num_heads,drive_num_sectors,&cylinder,&head,&sector);
+		lba_to_chs((fd_list[fd].pos / 512),drive_num_cylinder,drive_num_heads,drive_num_sectors,&cylinder,&head,&sector);
 //		printk("starting cylinder: ");
 //		printk(uitoa((unsigned int)cylinder));
 //		printk(" starting head: ");
@@ -228,14 +229,17 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 			sector++;
 			sector_offset = 0;
 		}
+		bytes_read = count;
 	}
 	else if (fd == 0) {
 		for(i=0;i < count; i++) {
-			((char *)buf)[i] = _getchar();
+			((char *)buf)[i] = b_getchar();
 		}
+		bytes_read = 0;
 	}
-	fd_list[fd].pos += count;
-	return 0;
+	//TODO: change the position only if this is not character device
+	fd_list[fd].pos += bytes_read;
+	return bytes_read;
 }
 
 int write(int fd, void *buf, unsigned int count,int pid) {
@@ -253,21 +257,12 @@ int write(int fd, void *buf, unsigned int count,int pid) {
 		}
 		return count;
 	}
-	return 0;
+	return count;
 }
 
 
 void printk(char *string) {
-	int i = 0;
-	//TODO: FIX THIS BUG!!!
-	//strlen(string);
-	//write(1,string,strlen(string),0);
-
-	while (string[i] != 0) {
-		//b_putchar(string[i]);
-		_putchar(string[i]);
-		i++;
-	}
+	write(1,string,strlen(string),0);
 }
 
 char *uitoa(unsigned int i) {

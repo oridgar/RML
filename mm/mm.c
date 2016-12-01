@@ -33,7 +33,7 @@ void init_seg() {
 	seg_arr[9].used = 0;
 	seg_arr[9].address = 0x9000;
 }
-
+//TODO: return some code that indicates that there is no free segment left
 unsigned int get_free_seg() {
 	int i;
 	unsigned int seg;

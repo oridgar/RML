@@ -169,7 +169,7 @@ int get_root_next_file(Fat16Entry *file) {
 	return 0;
 }
 
-int list_root_files(int size,file_out_format out_format) {
+int list_root_files(unsigned int buf_size, char *buf, file_out_format out_format) {
 	int i;
 	int j;
 	int fd;
@@ -186,8 +186,6 @@ int list_root_files(int size,file_out_format out_format) {
 	char hours;
 
 	// TODO: remove opening and seeking root folder and make sure get_root_next_file returns value that indicates there are no more files
-	fd = open("/",0,0);
-	lseek(fd,0,0);
 	// && sizeof(Fat16Entry)*files_read < size
 	for (i=0; i < bs.root_dir_entries; i++) {
 		get_root_next_file(&file);
@@ -390,7 +388,7 @@ int print_file(Fat16Entry *file) {
 		//curr_cluster = 0x0FF8;
 	} while (curr_cluster < 0x0FF8); //cluster value 0FF8h to 0FFFh is end of file
 	//FILL IN!
-	printf("\r\nEOF\r\n");
+	printk("\r\nEOF\r\n");
 	return 0;
 }
 

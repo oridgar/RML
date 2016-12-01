@@ -113,6 +113,8 @@ void reboot() {
 
 void _printstr(char *string) {
 	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
+	//memcpy(((SYSCALL_STREAM)sysparam).data,string,SYSCALL_DATA_SIZE);
+	//((SYSCALL_STREAM)sysparam).metadata.size = strlen(string);
 	syscall(0x04);
 	//dprintstr(string);
 }
@@ -121,10 +123,6 @@ void _putchar(char in) {
 	sysparam.param[0] = in;
 	syscall(0x05);
 	//dputchar(in);
-}
-
-void dispatch() {
-	syscall(0x05);
 }
 
 char _getchar() {

@@ -14,18 +14,6 @@ extern void farcall(int seg,int ofs); //call the program
 extern int b_int8_seg;
 extern int b_int8_offs;
 
-void printf(char *string) {
-	printstr(string);
-}
-
-void printstr(char *string) {
-	int i = 0;
-	while (string[i] != 0) {
-		_putchar(string[i]);
-		i++;
-	}
-}
-
 //-------------------------
 //CPU INSTRUCTIONS WRAPPERS
 //-------------------------
@@ -73,13 +61,15 @@ void startk() {
     //------------
     //Code Section
     //------------
-	printstr("starting kernel...\r\n");
+	printk("starting kernel...\r\n");
 	init_seg();
 	set_ivt();
 	set_scheduler();
 	//sti();
 
 	mount("/dev/fdb");
+	open("/dev/stdout", 0,0);
+	open("/dev/stdin", 0,0);
 	sti();
 	//while (1) { run_init(); }
 	while (1) {
@@ -95,7 +85,7 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 	//printk("We're in dispatch\r\n");
 	switch (service) {
 		case 0:
-			printk("system call!\r\n");
+			write(1,"system call!\r\n",14,0);
 			break;
 		case 1:
 			halt();
@@ -104,21 +94,15 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			reboot();
 			break;
 		case 3:
-			//TODO: change from _getchar() to read()
-			//read(0,params->param,1);
-			params->param[0] = _getchar();
 			break;
 		case 4:
-			printk(params->param);
+			write(1,params->param,strlen(params->param),0);
 			break;
 		case 5:
-			//TODO: change from _putchar() to write()
-			_putchar(params->param[0]);
+			write(1,params->param,1,0);
 			break;
 		case 6:
-			//TODO: change from _getchar() to read()
-			//read(0,params->param,1);
-			params->param[0] = _getchar();
+			read(0,params->param,1);
 			break;
 		case 7:
 			//run_shell();
@@ -130,9 +114,9 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			get_process_list();
 			break;
 		case 9:
-			//fd = open("/",0);
-			//lseek(fd,0,0);
-			list_root_files(32,FILE_OUT_LIST);
+			fd = open("/",0,0);
+			lseek(fd,0,0);
+			list_root_files(32,((SYSCALL_STREAM*)params)->data ,FILE_OUT_LIST);
 			break;
 		/*
 		case 10:
