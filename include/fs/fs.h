@@ -1,12 +1,12 @@
 #ifndef _FS_H
 #define _FS_H
 
+#include <sysdef.h>
 //----------------
 //types definition
 //----------------
 
 typedef enum {TYPE_VFAT,TYPE_DELETED,TYPE_NONE,TYPE_VOLLABEL,TYPE_FILE} entry_type;
-typedef enum {FILE_OUT_LIST,FILE_OUT_WIDE} file_out_format;
 
 typedef struct {
     unsigned char jmp[3];
@@ -76,7 +76,7 @@ int extract_file_name(Fat16Entry *file,char *filename,char *ext);
 int get_file(Fat16Entry *file_list,char *name,Fat16Entry *file);
 int get_root_size();
 int get_root_offset();
-int list_root_files(unsigned int buf_size, char *buf, file_out_format out_format);
+int list_root_files(unsigned int buf_size, SYSCALL_FILE_ENTRY *buf, file_out_format out_format);
 
 
 #endif

@@ -52,11 +52,77 @@ char b_getchar() {
 	return temp;
 }
 
+char b_getchar_sync() {
+	char temp;
+	asm {
+		mov ah,00h
+		int 16h
+		mov [temp],al
+	}
+	return temp;
+}
+
+unsigned char b_query_kb_stat() {
+	asm {
+		mov ah,01h
+		int 16h
+		jnz gotKey
+	}
+	return 0;
+
+	gotKey:
+	return 1;
+}
+
 void reboot() {
 	asm {
 		int 19h
 	}
 }
+
+void read_RTC_time(unsigned int *out_hours,unsigned int *out_minutes,unsigned int *out_seconds) {
+	unsigned char hours, minutes, seconds;
+	asm {
+		push ax
+		push cx
+		push dx
+		mov ah,02h
+		int 1Ah
+		mov [hours],ch
+		mov [minutes],cl
+		mov [seconds],dh
+		pop dx
+		pop cx
+		pop ax
+	}
+	*out_hours = ((hours & 0xF0) >> 4) * 10 + (hours & 0x0F);
+	*out_minutes = ((minutes & 0xF0) >> 4) * 10 + (minutes & 0x0F);
+	*out_seconds = ((seconds & 0xF0) >> 4) * 10 + (seconds & 0x0F);
+}
+
+void read_RTC_date(unsigned int *out_year,unsigned int *out_month,unsigned int *out_day) {
+	unsigned char century,year,month,day;
+	asm {
+		push ax
+		push cx
+		push dx
+		mov ah,04h
+		int 1Ah
+		mov [century],ch
+		mov [year],cl
+		mov [month],dh
+		mov [day],dl
+		pop dx
+		pop cx
+		pop ax
+	}
+	*out_year = ((century & 0xF0) >> 4) * 1000 + (century & 0x0F) * 100
+		+ ((year & 0xF0) >> 4) * 10 + (year & 0x0F);
+	*out_month = ((month & 0xF0) >> 4) * 10 + (month & 0x0F);
+	*out_day = ((day & 0xF0) >> 4) * 10 + (day & 0x0F);
+}
+
+
 
 //==================
 //END BIOS FUNCTIONS

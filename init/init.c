@@ -7,7 +7,6 @@ void main() {
 	printf(str1);
 	printf(str2);
 
-	//printf("testing #%d %s",(int)50,"hello!!!!");
 	run_program("shell");
 	//return 0;
 }

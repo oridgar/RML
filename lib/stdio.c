@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <io.h>
 
 //FILE *fopen(const char *filename, const char *mode) {
 //
@@ -57,6 +58,7 @@ int vfprintf(FILE *stream,const char *template,va_list ap) {
 	int i = 0;
 	char *sval;
 	int ival;
+	char strnum[7];
 
 	if (stream->fd == 1) {
 		while (template[i] != 0) {
@@ -80,7 +82,9 @@ int vfprintf(FILE *stream,const char *template,va_list ap) {
 			case 'd':
 				ival = va_arg(ap,int);
 				//TODO: change it to write() function
-				_printstr(itoa(ival));
+				strcpy(strnum,itoa(ival));
+				mywrite(1,strnum,strlen(strnum));
+				//_printstr(itoa(ival));
 				i++;
 				break;
 			}
@@ -129,19 +133,24 @@ int fgetc(FILE *stream) {
 }
 
 int fputc(int c, FILE *stream) {
-	if (stream->fd == 1) {
-		//TODO: change it to write() or fwrite()
-		_putchar((char)c);
-	}
+	mywrite(stream->fd,(char *)(&c),1);
+//	if (stream->fd == 1) {
+//		//TODO: change it to write() or fwrite()
+//		_putchar((char)c);
+//	}
 	return 0;
+
 }
 
 char getchar() {
+	char in;
 	//TODO: change it to fgetc() function
 	//FILE mystdin;
 	//mystdin.fd = 1;
 	//return (char)fgetc(mystdin);
-	return _getchar();
+	myread(0,&in,1);
+	return in;
+	//return _getchar();
 }
 
 void putchar(char in) {
@@ -149,7 +158,8 @@ void putchar(char in) {
 	//FILE mystdout;
 	//mystdout.fd = 1;
 	//fputc((int)in,mystdout);
-	_putchar(in);
+	mywrite(1,&in,1);
+	//_putchar(in);
 }
 
 

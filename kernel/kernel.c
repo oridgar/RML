@@ -13,6 +13,7 @@
 extern void farcall(int seg,int ofs); //call the program
 extern int b_int8_seg;
 extern int b_int8_offs;
+void time();
 
 //-------------------------
 //CPU INSTRUCTIONS WRAPPERS
@@ -58,20 +59,24 @@ void startk() {
 	//--------------------
 	int i;
 
+
     //------------
     //Code Section
     //------------
+	open("/dev/stdout", 0,0);
 	printk("starting kernel...\r\n");
+//	printk("buffer size: ");
+//	printk(uitoa(SYSCALL_BUF_SIZE));
+//	printk("\r\n");
 	init_seg();
 	set_ivt();
 	set_scheduler();
 	//sti();
 
 	mount("/dev/fdb");
-	open("/dev/stdout", 0,0);
 	open("/dev/stdin", 0,0);
 	sti();
-	//while (1) { run_init(); }
+
 	while (1) {
 		init_processes();
 		run_program("init");
@@ -81,7 +86,11 @@ void startk() {
 void _dispatch(int service,SYSCALL_PARAM *params) {
 	int curr_pid;
 	int fd;
+	//temp
+	int files_read;
+	int i;
 
+	curr_pid = get_running_proc();
 	//printk("We're in dispatch\r\n");
 	switch (service) {
 		case 0:
@@ -102,11 +111,9 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			write(1,params->param,1,0);
 			break;
 		case 6:
-			read(0,params->param,1);
+			read(0,params->param,1,0);
 			break;
 		case 7:
-			//run_shell();
-			curr_pid = get_running_proc();
 			*(int *)params->param = run_program(params->param);
 			set_running_proc(curr_pid);
 			break;
@@ -115,26 +122,29 @@ void _dispatch(int service,SYSCALL_PARAM *params) {
 			break;
 		case 9:
 			fd = open("/",0,0);
-			lseek(fd,0,0);
-			list_root_files(32,((SYSCALL_STREAM*)params)->data ,FILE_OUT_LIST);
+			lseek(fd,0,0,0);
+			files_read = list_root_files(512,((SYSCALL_STD*)params)->data ,FILE_OUT_LIST);
+			((SYSCALL_FILE_ENTRY_METADATA *)((SYSCALL_STD*)params)->metadata)->files_read = files_read;
 			break;
-		/*
 		case 10:
-			//open()
+			fd = open(((SYSCALL_STREAM*)params)->data, 0,curr_pid);
+			((SYSCALL_STREAM_METADATA *)((SYSCALL_STD*)params)->metadata)->fd = fd;
 			break;
 		case 11:
-			//close()
+			close(((SYSCALL_STREAM*)params)->metadata.fd,curr_pid);
 			break;
 		case 12:
-			//seek()
+			lseek(((SYSCALL_STREAM*)params)->metadata.fd, ((SYSCALL_STREAM*)params)->metadata.offset, 0,curr_pid);
 			break;
 		case 13:
-			//read()
+			read(((SYSCALL_STREAM*)params)->metadata.fd, ((SYSCALL_STREAM*)params)->data, ((SYSCALL_STREAM*)params)->metadata.size,curr_pid);
 			break;
 		case 14:
-			//write()
+			write(((SYSCALL_STREAM*)params)->metadata.fd, ((SYSCALL_STREAM*)params)->data, ((SYSCALL_STREAM*)params)->metadata.size,curr_pid);
 			break;
-		*/
+		case 15:
+			time();
+			break;
 		default:
 			break;
 	}
@@ -263,6 +273,8 @@ int run_program(char *name) {
 		//For now supporting only binary format. code origin is in 0x0000 or 0h
 		//printk("set_running_proc\r\n");
 		set_running_proc(pid);
+		open("/dev/stdin",0,pid);
+		open("/dev/stdout",0,pid);
 		farcall(segment,0x0000);
 	
 	//	printstr("returned to kernel...\r\n");
@@ -370,4 +382,24 @@ void save_oldint8() {
 	//printk(myitoa(offs));
 	//printk("segment:");
 	//printk(myitoa(segment));
+}
+
+void time() {
+	unsigned int hours,minutes,seconds,year,month,day;
+
+	read_RTC_date(&year,&month,&day);
+	printk(uitoa(year));
+	printk("/");
+	printk(uitoa(month));
+	printk("/");
+	printk(uitoa(day));
+	printk(" ");
+	read_RTC_time(&hours,&minutes,&seconds);
+	printk(uitoa(hours));
+	printk(":");
+	printk(uitoa(minutes));
+	printk(":");
+	printk(uitoa(seconds));
+	printk("\r\n");
+
 }

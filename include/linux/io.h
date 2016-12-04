@@ -9,10 +9,10 @@ void call_int();
 void halt();
 void syscall(int service);
 void reboot();
-void _printstr(char *string);
-void _putchar(char in);
+//void _printstr(char *string);
+//void _putchar(char in);
 void dispatch();
-char _getchar();
+//char _getchar();
 //returns file descriptor
 //int open(const char *pathname,int flags);
 int myopen(const char *pathname, int flags, unsigned int mode);
@@ -28,6 +28,7 @@ unsigned int mywrite(int fd, const void *buf, unsigned int count);
 unsigned int mylseek(int fildes, unsigned int offset, int whence);
 void get_process_list();
 int run_program(char *string);
-void list_root_files();
+int list_root_files(char *buf);
+void time();
 
 #endif

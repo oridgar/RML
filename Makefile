@@ -15,7 +15,7 @@ all:
 
 	@echo copying kernel to disk sectors directly
 	#seek + 1 = sector !!!!
-	dd if=./obj/KERNEL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=2 count=16
+	dd if=./obj/KERNEL.BIN of=./obj/disk1.img conv=notrunc bs=512 seek=2 count=34
 	
 	@echo creating filesystem disk and copying all user space applications
 	mkfs.fat -n TEST1 -s 8 -S 512 -f 1 -F 12 ./obj/fat.img

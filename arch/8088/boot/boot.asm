@@ -90,6 +90,14 @@ loddsp:		mov  ah,0x02 ; Read Sectors From Drive service
 			mov  bx,0x0 ;  entry point
 			mov  es,[kernseg] ; third 64K segment
 			int  13h ; call BIOS to read sectors from floppy
+loddsp2:	mov  ah,0x02 ; Read Sectors From Drive service
+			mov  al,0x12 ; number of sectors
+			mov  cl,0x01 ; starting from sector
+			mov  dh,0x01 ; head
+			mov  bx,0x2000 ;  entry point
+			mov  es,[kernseg] ; third 64K segment
+			int  13h ; call BIOS to read sectors from floppy
+
 			
 ;start kernel			
 ;init:		jmp  SHSEG:0100h

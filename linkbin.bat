@@ -4,12 +4,14 @@ cd d:\obj
 del *.obj
 del *.map > NUL
 del *.bin
+del *.lib
 del result.txt
 
 rem creating object file from ASM code which will initiate C code
 tasm  d:\utils\head.asm >> result.txt 
 rem IF ERRORLEVEL 1 pause
 tasm  d:\arch\8088\kernel\dispatch.asm >> result.txt 
+rem tasm  d:\arch\8088\tclib\runtime.asm >> result.txt 
 rem IF ERRORLEVEL 1 pause
 rem creating object file from C code
 echo ////////////////////
@@ -58,6 +60,13 @@ rem cc -Id:\include -mt -c d:\fs\msdos\example.c
 rem IF ERRORLEVEL 1 pause
 rem -------------------------------------------
 
+echo /////////////////////////
+echo building static libraries
+echo /////////////////////////
+
+tlib std.lib +string.obj +stdlib.obj +stdio.obj >> result.txt
+tlib kern.lib +sched.obj +mm.obj +bios.obj +kernio.obj +fs.obj >> result.txt
+
 echo //////////////
 echo linking kernel
 echo //////////////
@@ -65,34 +74,42 @@ rem note that /t is tiny - no executable header but binary format. /s is for cre
 rem at the end there is comma and after that the name of the output file. THIS IS IMPORTANT AS WITHOUT THIS FORMAT THE LINKER WILL SHOUT ON THE FACT THAT
 rem THE CODE IS NOT STARTED AT ORIGIN 100h.
 rem also dispatch.obj must be first as it is an assembly code with entry point and the linker demands that the first file will includes entry point
-tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj bios.obj kernio.obj fs.obj string.obj ctype.obj utils.obj,kernel.bin >> result.txt 
+
+rem tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj bios.obj kernio.obj fs.obj string.obj ctype.obj utils.obj,kernel.bin >> result.txt 
+tlink /t /s dispatch.obj .\tc\minrt.lib kernel.obj kern.lib string.obj ctype.obj utils.obj,kernel.bin >> result.txt 
 rem IF ERRORLEVEL 1 pause
 
 echo ////////////
 echo linking init
 echo ////////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\init.obj,init.bin >> result.txt 
+rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\init.obj,init.bin >> result.txt 
+tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\init.obj,init.bin >> result.txt 
 rem IF ERRORLEVEL 1 pause
 
 echo /////////////
 echo linking shell
 echo /////////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\shell.obj,shell.bin >> result.txt 
+rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\shell.obj,shell.bin >> result.txt 
+tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\shell.obj,shell.bin >> result.txt 
+
 rem IF ERRORLEVEL 1 pause
 
 echo //////////
 echo linking ls
 echo //////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ls.obj,ls.bin >> result.txt 
+rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ls.obj,ls.bin >> result.txt 
+tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\ls.obj,ls.bin >> result.txt 
 rem IF ERRORLEVEL 1 pause
 
 echo //////////
 echo linking ps
 echo //////////
-tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ps.obj,ps.bin >> result.txt 
+rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ps.obj,ps.bin >> result.txt 
+tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\ps.obj,ps.bin >> result.txt 
 
 echo /////////////////
 echo full compile demo
 echo /////////////////
 tcc -Id:\include -mt -c d:\utils\demo.c
-tlink /t /s head.obj io.obj stdio.obj string.obj stdlib.obj ctype.obj demo.obj,demo.bin >> result.txt
+rem tlink /t /s head.obj io.obj stdio.obj string.obj stdlib.obj ctype.obj demo.obj,demo.bin >> result.txt
+tlink /t /s head.obj .\tc\minrt.lib io.obj std.lib ctype.obj demo.obj,demo.bin >> result.txt

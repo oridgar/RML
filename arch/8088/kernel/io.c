@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sysdef.h>
+#include <stdlib.h>
 
 void syscall(int service);
 void _putchar(char in);
@@ -21,8 +22,8 @@ void dprintstr(char *string) {
 	memcpy(sysparam.param,string,512);
 	
 	while (sysparam.param[i] != 0) {
-		//dputchar(sysparam.param[i]);
-		_putchar(sysparam.param[i]);
+		dputchar(sysparam.param[i]);
+		//_putchar(sysparam.param[i]);
 		i++;
 	}
 }
@@ -111,25 +112,25 @@ void reboot() {
 	syscall(0x02);
 }
 
-void _printstr(char *string) {
-	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
-	//memcpy(((SYSCALL_STREAM)sysparam).data,string,SYSCALL_DATA_SIZE);
-	//((SYSCALL_STREAM)sysparam).metadata.size = strlen(string);
-	syscall(0x04);
-	//dprintstr(string);
-}
+//void _printstr(char *string) {
+//	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
+//	//memcpy(((SYSCALL_STREAM)sysparam).data,string,SYSCALL_DATA_SIZE);
+//	//((SYSCALL_STREAM)sysparam).metadata.size = strlen(string);
+//	syscall(0x04);
+//	//dprintstr(string);
+//}
 
-void _putchar(char in) {
-	sysparam.param[0] = in;
-	syscall(0x05);
-	//dputchar(in);
-}
+//void _putchar(char in) {
+//	sysparam.param[0] = in;
+//	syscall(0x05);
+//	//dputchar(in);
+//}
 
-char _getchar() {
-	syscall(0x06);
-	return sysparam.param[0];
-	//return dgetchar();
-}
+//char _getchar() {
+//	syscall(0x06);
+//	return sysparam.param[0];
+//	//return dgetchar();
+//}
 
 int run_program(char *string) {
 	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
@@ -141,8 +142,22 @@ void get_process_list() {
 	syscall(0x08);
 }
 
-void list_root_files() {
+int list_root_files(char *buf) {
+	int i,j,fd;
+	int files;
+	char *bufp;
+
+	fd = myopen("/",0,0);
+	printf ("opened / with file descriptor %d\r\n",fd);
 	syscall(0x09);
+
+	files = ((SYSCALL_FILE_ENTRY_METADATA *)((SYSCALL_STD*)&sysparam)->metadata)->files_read;
+	bufp = buf;
+	for (i=0; i < files; i++) {
+		memcpy(bufp,&(((SYSCALL_FILE_ENTRY *)((SYSCALL_STD*)&sysparam)->data)[i]),sizeof(SYSCALL_FILE_ENTRY));
+		bufp += sizeof(SYSCALL_FILE_ENTRY);
+	}
+	return files;
 }
 
 //-----
@@ -150,64 +165,50 @@ void list_root_files() {
 //-----
 
 int myopen(const char *pathname, int flags, unsigned int mode) {
+	memcpy(((SYSCALL_STREAM*)&sysparam)->data,pathname,strlen(pathname));
 	syscall(10);
-	return 0;
+	return  ((SYSCALL_STREAM_METADATA *)((SYSCALL_STD*)&sysparam)->metadata)->fd;
 }
 int myclose(int fd) {
+	((SYSCALL_STREAM*)&sysparam)->metadata.fd = fd;
 	syscall(11);
 	return 0;
 }
 unsigned int mylseek(int fildes, unsigned int offset, int whence) {
+	((SYSCALL_STREAM*)&sysparam)->metadata.fd = fildes;
+	((SYSCALL_STREAM*)&sysparam)->metadata.offset = offset;
 	syscall(12);
 	return 0;
 }
 
 unsigned int myread(int fd, void *buf, unsigned int count) {
+	((SYSCALL_STREAM*)&sysparam)->metadata.fd = fd;
+	((SYSCALL_STREAM*)&sysparam)->metadata.size = count;
 	syscall(13);
+	memcpy(buf,((SYSCALL_STREAM*)&sysparam)->data,count);
 	return 0;
 }
 
 unsigned int mywrite(int fd, const void *buf, unsigned int count) {
+	((SYSCALL_STREAM*)&sysparam)->metadata.fd = fd;
+	((SYSCALL_STREAM*)&sysparam)->metadata.size = count;
+	memcpy(((SYSCALL_STREAM*)&sysparam)->data,buf,count);
 	syscall(14);
 	return 0;
 }
 
-
-
-/*
-int myopen(const char *pathname, int flags, unsigned int mode) {
-	memcpy(pathname,sysparam.param,256);
-	syscall(0x08);
-	return (int)sysparam.param;
+void time() {
+	syscall(15);
 }
 
-int myclose(int fd) {
-	memcpy(&fd,sysparam.param,sizeof(fd));
-	syscall(0x09);
-	return (int)sysparam.param;
-}
-
-unsigned int myread(int fd, void *buf, unsigned int count) {
-	memcpy(fd,(&((SYSCALL_FILEIO)sysparam).fd),sizeof(fd));
-	memcpy(&count,&(((SYSCALL_FILEIO)sysparam).count),sizeof(count));
-	syscall(0x10);
-	memcpy(&sysparam,buf,512);
-	return 0;
-}
-
-unsigned int mywrite(int fd, const void *buf, unsigned int count) {
-	SYSCALL_FILEIO *params = (SYSCALL_FILEIO)sysparam;
-	memcpy(fd,&params->fd,sizeof(fd));
-	memcpy(count,&params->count,sizeof(count));
-	memcpy(buf,&params->buf,sizeof(params->buf));
-	syscall(0x11);
-	return sysparam;
-}
-
-unsigned int mylseek(int fildes, unsigned int offset, int whence) {
-	return 0;
-}
-*/
+//int getpid();
+//exit(status);
+//int waitpid(pid, &statloc, opts)
+//fork()
+//mount(special, name, flag)
+//int getppid()
+//sethostname
+//time_t time() Epoch time (00:00:00 UTC, January 1, 1970)
 
 /*
 fork();

@@ -22,8 +22,8 @@ int read_boot_sector() {
 	unsigned int  root_sectors;
 
 	//reading the boot sector which includes BIOS Parameter Block + Extended BIOS Parameter Block
-	lseek(4,0, 0);
-	read(4, &bs, sizeof(Fat16BootSector));
+	lseek(4,0,0,0);
+	read(4, &bs, sizeof(Fat16BootSector),0);
 
     root_sectors = bs.root_dir_entries * 32 / bs.sector_size;
 
@@ -43,8 +43,8 @@ int read_fat(char* fatcache) {
 	//moving to position of next cluster entry in fat + reading
 	//WORKING!
 	//FILL IN!
-	lseek(4,s_pos.fat_section_start, 0);
-	read(4,fatcache, (bs.number_of_fats * bs.fat_size_sectors));
+	lseek(4,s_pos.fat_section_start, 0,0);
+	read(4,fatcache, (bs.number_of_fats * bs.fat_size_sectors),0);
 
 	//fseek(drv, s_pos.fat_section_start, SEEK_SET);
 	//fread(fatcache, (bs.number_of_fats * bs.fat_size_sectors), 1, drv);
@@ -56,8 +56,8 @@ int read_fat(char* fatcache) {
 int read_root_dir(char *rootcache) {
 	//seeking to the beginning of root directory area
 	//FILL IN!
-	lseek(4,s_pos.root_directory_start, 0);
-	read(4,rootcache, sizeof(Fat16Entry) * bs.root_dir_entries);
+	lseek(4,s_pos.root_directory_start, 0,0);
+	read(4,rootcache, sizeof(Fat16Entry) * bs.root_dir_entries,0);
 
 	//fseek(drv, s_pos.root_directory_start , SEEK_SET);
 	//fread(rootcache, sizeof(Fat16Entry) * bs.root_dir_entries, 1, drv);
@@ -89,8 +89,8 @@ int read_cluster(char *buffer,unsigned int cluster_num) {
 //	printk(uitoa(seek_pos));
 //	printk("\r\n");
 	//END DEBUG
-	lseek(4,seek_pos, 0);
-	read(4,buffer, cluster_size);
+	lseek(4,seek_pos, 0,0);
+	read(4,buffer, cluster_size,0);
 
 	return 0;
 }
@@ -120,10 +120,10 @@ int get_next_cluster(unsigned int curr_cluster,unsigned int *next_cluster) {
 	//WORKING!
 	//FILL IN!
 	//fseek(drv, s_pos.fat_section_start + cluster_entry, SEEK_SET);
-	lseek(4,s_pos.fat_section_start + cluster_entry, 0);
+	lseek(4,s_pos.fat_section_start + cluster_entry, 0,0);
 	*next_cluster = 0;
 	//fread(next_cluster, 2, 1, drv);
-	read(4,next_cluster, 2);
+	read(4,next_cluster, 2,0);
 
 	// if the current cluster is odd
 	if (curr_cluster & 0x0001) {
@@ -142,9 +142,9 @@ int get_root_files(Fat16Entry *files) {
 	int i;
 
 
-	lseek(5,0,0);
+	lseek(5,0,0,0);
 	for(i=0; i < bs.root_dir_entries;i++) {
-		read(5,&files[i], sizeof(Fat16Entry));
+		read(5,&files[i], sizeof(Fat16Entry),0);
 	}
 
 
@@ -164,12 +164,16 @@ int get_root_files(Fat16Entry *files) {
 }
 
 int get_root_next_file(Fat16Entry *file) {
-	read(5,file, sizeof(Fat16Entry));
-
-	return 0;
+	if (fd_list[5].pos + sizeof(Fat16Entry) <= (bs.root_dir_entries * sizeof(Fat16Entry))) {
+		read(5,file, sizeof(Fat16Entry),0);
+		return 0;
+	}
+	else {
+		return -1;
+	}
 }
 
-int list_root_files(unsigned int buf_size, char *buf, file_out_format out_format) {
+int list_root_files(unsigned int buf_size, SYSCALL_FILE_ENTRY *buf, file_out_format out_format) {
 	int i;
 	int j;
 	int fd;
@@ -178,136 +182,58 @@ int list_root_files(unsigned int buf_size, char *buf, file_out_format out_format
 	fileAttrib attrib;
 	char name[9];
 	char ext[4];
-	char day;
-	char month;
-	unsigned int year;
-	char seconds;
-	char minutes;
-	char hours;
+	unsigned int num_read_entries;
+
+	num_read_entries = buf_size / sizeof(SYSCALL_FILE_ENTRY);
 
 	// TODO: remove opening and seeking root folder and make sure get_root_next_file returns value that indicates there are no more files
 	// && sizeof(Fat16Entry)*files_read < size
-	for (i=0; i < bs.root_dir_entries; i++) {
-		get_root_next_file(&file);
-		if (get_entry_type(&file) == TYPE_FILE) {
-			//deleted file
-			if (file.filename[0] == 0xe5) {
-				continue;
-			}
-			//no file
-			else if (file.filename[0] == 0x00) {
-				break;
-			}
-			else {
-				extract_file_name(&file,name,ext);
-
-				switch (out_format) {
-				case FILE_OUT_WIDE:
-					printk(name);
-					printk(".");
-					printk(ext);
-					printk(" ");
-					printk("   ");
-					break;
-				case FILE_OUT_LIST:
-					file_attrib(&file,&attrib);
-
-					if (attrib.subdirectory) {
-						printk("d");
-					}
-					else {
-						printk("-");
-					}
-
-					for(j=0; j < 3; j++) {
-						printk("r");
-						if (attrib.read_only) {
-							printk("-");
-						}
-						else {
-							printk("w");
-						}
-						printk("x");
-					}
-
-					printk(" root root ");
-					printk(uitoa(file.file_size));
-					printk(" ");
-
-					day = file.modify_date & 0x001F;
-					month = (file.modify_date & 0x01E0) >> 5;
-					year = ((file.modify_date & 0xFE00) >> 9) + 1980;
-
-					switch ((unsigned int)month) {
-						case 1:
-							printk("Jan");
-							break;
-						case 2:
-							printk("Feb");
-							break;
-						case 3:
-							printk("Mar");
-							break;
-						case 4:
-							printk("Apr");
-							break;
-						case 5:
-							printk("May");
-							break;
-						case 6:
-							printk("Jun");
-							break;
-						case 7:
-							printk("Jul");
-							break;
-						case 8:
-							printk("Aug");
-							break;
-						case 9:
-							printk("Sep");
-							break;
-						case 10:
-							printk("Oct");
-							break;
-						case 11:
-							printk("Nov");
-							break;
-						case 12:
-							printk("Dec");
-							break;
-						default:
-							printk("   ");
-					}
-					//printk(uitoa((unsigned int)month));
-					printk(" ");
-					printk(uitoa((unsigned int)day));
-					printk(" ");
-					//TODO: get the current date and if the files created in the same date, only then show the time
-					seconds = (file.modify_time & 0x001F) * 2;
-					minutes = (file.modify_time & 0x07E0) >> 5;
-					hours = (file.modify_time & 0xF800) >> 11;
-					printk(uitoa((unsigned int)hours));
-					printk(":");
-					printk(uitoa((unsigned int)minutes));
-					//printk(":");
-					//printk(uitoa((unsigned int)seconds));
-
-					//printk(uitoa((unsigned int)year));
-					printk(" ");
-					//printk("Xxx ");
-					//printk("xx ");
-					//printk("xx:xx ");
-					printk(name);
-					printk(".");
-					printk(ext);
-					printk("\r\n");
-					break;
-				}
-				files_read++;
-			}
-			//print_file_attrib(&files[i],&attrib);
+	while (num_read_entries > 0 && get_root_next_file(&file) != -1) {
+		if (get_entry_type(&file) != TYPE_FILE) {
+			continue;
+		}
+		//deleted file
+		if (file.filename[0] == 0xe5) {
+			continue;
+		}
+		//no file
+		else if (file.filename[0] == 0x00) {
+			break;
 		}
 
+		extract_file_name(&file,name,ext);
+		file_attrib(&file,&attrib);
+
+		if (attrib.subdirectory) {
+			buf[files_read].dir = 1;
+		}
+		else {
+			buf[files_read].dir = 0;
+		}
+
+		if (attrib.read_only) {
+			buf[files_read].read_only = 1;
+		}
+		else {
+			buf[files_read].read_only = 0;
+		}
+
+		buf[files_read].size = file.file_size;
+
+		buf[files_read].day = file.modify_date & 0x001F;
+		buf[files_read].month = (file.modify_date & 0x01E0) >> 5;
+		buf[files_read].year = ((file.modify_date & 0xFE00) >> 9) + 1980;
+
+		//TODO: get the current date and if the files created in the same date, only then show the time
+		buf[files_read].hours = (file.modify_time & 0xF800) >> 11;
+		buf[files_read].minutes = (file.modify_time & 0x07E0) >> 5;
+		buf[files_read].seconds = (file.modify_time & 0x001F) * 2;
+
+		strcpy(buf[files_read].name,name);
+		strcpy(buf[files_read].ext,ext);
+
+		files_read++;
+		--num_read_entries;
 	}
 	//get_root_files(file_list);
 	//list_files(file_list);

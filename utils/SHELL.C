@@ -49,19 +49,24 @@ int shell() {
 			call_int();
 		}
 		else if (strcmp(buf,"aaa") == 0) {
-			_printstr("Hello kernel!");
+			//_printstr("Hello kernel!");
+			printf("Hello kernel!");
 		}
 		else if (strcmp(buf,"bbb") == 0) {
-			_putchar('S');
+			//_putchar('S');
+			putchar('S');
 		}
 		else if (strcmp(buf,"ccc") == 0) {
 			for(j=0; j < 10; j++) {
-				buf[j]=_getchar();
-				_putchar(buf[j]);
+				buf[j]=getchar();
+				//_putchar(buf[j]);
+				putchar(buf[j]);
 			}
 			buf[10]='\0';
-			_printstr("\r\n");
-			_printstr(buf);
+//			_printstr("\r\n");
+//			_printstr(buf);
+			printf("\r\n");
+			printf(buf);
 		}
 		else if (strcmp(buf,"halt") == 0) {
 			halt();
@@ -72,9 +77,12 @@ int shell() {
 		else if (strcmp(buf,"exit") == 0) {
 			break;
 		}
+		else if (strcmp(buf,"date") == 0) {
+			time();
+		}
 		else {
 			//TODO: change run_program to system()
-			if (run_program(buf)) {
+			if (system(buf)) {
 				printf(buf);
 				printf(": command not found");
 			}

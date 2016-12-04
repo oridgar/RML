@@ -59,32 +59,37 @@ int unregister_proc(int pid) {
 
 int get_process_list() {
 	int i;
-	printk("pid ppid cs name status size\r\n");
+	printk("USER PID PPID CS STAT SIZE NAME\r\n");
 	for(i=0; i < NUM_PROCESSES; i++) {
 		if(processes[i].pid != 0) {
+			printk("root");
+			printk(" ");
 			printk(uitoa(processes[i].pid));
 			printk(" ");
 			printk(uitoa(processes[i].ppid));
 			printk(" ");
 			printk(uitoa(processes[i].cs));
 			printk(" ");
-			printk(processes[i].name);
-			printk(" ");
 			switch (processes[i].state) {
 			case READY:
 				printk("READY");
+				//should be R
 				break;
 			case WAIT:
 				printk("WAIT");
+				//should be S or D?
 				break;
 			case RUNNING:
 				printk("RUNNING");
+				//should be R
 				break;
 			default:
 				printk("UNKNOWN");
 			}
 			printk(" ");
 			printk(uitoa(processes[i].size));
+			printk(" ");
+			printk(processes[i].name);
 			printk("\r\n");
 		}
 	}

@@ -6,3 +6,4 @@ log: e:\bochsout.txt
 mouse: enabled=0
 display_library: win32
 debug_symbols: file=bochs_debug.sym
+clock: sync=realtime, rtc_sync=1, time0=utc

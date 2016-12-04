@@ -78,23 +78,43 @@ int open(const char *pathname, int flags,int pid) {
 }
 
 //TODO: change to int close(int fd,int pid) {
-int close(int fd) {
-	fd_list[fd].pathname[0] = '\0';
-	fd_list[fd].pfd = 0;
-	fd_list[fd].pfd_offset = 0;
-	fd_list[fd].pos = 0;
-	fd_list[fd].size = 0;
+int close(int fd,int pid) {
+	FileDescriptor *curr_fd_list;
+
+	//TODO: change the file descriptor table from global wide to process wide
+	if (pid == 0) {
+		curr_fd_list = fd_list;
+	}
+	else {
+		curr_fd_list = processes[pid-1].files_table;
+	}
+
+	curr_fd_list[fd].pathname[0] = '\0';
+	curr_fd_list[fd].pfd = 0;
+	curr_fd_list[fd].pfd_offset = 0;
+	curr_fd_list[fd].pos = 0;
+	curr_fd_list[fd].size = 0;
 	return 0;
 }
 
 //TODO: change to off_t lseek(int fd, off_t offset, int whence,int pid)
-off_t lseek(int fd, off_t offset, int whence) {
-	fd_list[fd].pos = offset;
+off_t lseek(int fd, off_t offset, int whence,int pid) {
+	FileDescriptor *curr_fd_list;
+
+	//TODO: change the file descriptor table from global wide to process wide
+	if (pid == 0) {
+		curr_fd_list = fd_list;
+	}
+	else {
+		curr_fd_list = processes[pid-1].files_table;
+	}
+
+	curr_fd_list[fd].pos = offset;
 	return offset;
 }
 
 //TODO: change to unsigned int read(int fd, void *buf, unsigned int count,int pid)
-unsigned int read(int fd, void *buf, unsigned int count) {
+unsigned int read(int fd, void *buf, unsigned int count,int pid) {
 	unsigned char cylinder;
 	unsigned char head;
 	unsigned char sector;
@@ -110,6 +130,15 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	char *new_buf;
 	int  i;
 	int bytes_read;
+	FileDescriptor *curr_fd_list;
+
+	//TODO: change the file descriptor table from global wide to process wide
+	if (pid == 0) {
+		curr_fd_list = fd_list;
+	}
+	else {
+		curr_fd_list = processes[pid-1].files_table;
+	}
 
 	new_buf = (char *) buf;
 	//DEBUG
@@ -137,8 +166,8 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	//END DEBUG
 	//while there are device loops
 	if (fd_list[fd].pfd != -1) {
-		lseek(fd_list[fd].pfd,fd_list[fd].pfd_offset + fd_list[fd].pos,0);
-		bytes_read = read(fd_list[fd].pfd,new_buf,count);
+		lseek(fd_list[fd].pfd,fd_list[fd].pfd_offset + fd_list[fd].pos,0,pid);
+		bytes_read = read(fd_list[fd].pfd,new_buf,count,0);
 	}
 	//the device is direct/hardware block/character device
 	else if (fd == 3 || fd == 4) {
@@ -233,7 +262,8 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 	}
 	else if (fd == 0) {
 		for(i=0;i < count; i++) {
-			((char *)buf)[i] = b_getchar();
+			//((char *)buf)[i] = b_getchar();
+			((char *)buf)[i] = b_getchar_sync();
 		}
 		bytes_read = 0;
 	}
@@ -244,6 +274,16 @@ unsigned int read(int fd, void *buf, unsigned int count) {
 
 int write(int fd, void *buf, unsigned int count,int pid) {
 	int i;
+	FileDescriptor *curr_fd_list;
+
+	//TODO: change the file descriptor table from global wide to process wide
+	if (pid == 0) {
+		curr_fd_list = fd_list;
+	}
+	else {
+		curr_fd_list = processes[pid-1].files_table;
+	}
+
 	//char *msg = "write function!!!\r\n";
 
 	//while(*msg != '\0') {
