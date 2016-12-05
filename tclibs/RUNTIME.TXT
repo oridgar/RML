@@ -1,0 +1,1862 @@
+Publics by module
+
+ABS     	size = 14
+	_abs                            
+
+ABSREAD 	size = 276
+	_absread                          _abswrite
+
+ACCESS  	size = 49
+	_access                         
+
+ALLOCA  	size = 50
+	_alloca                         
+
+ALLOCMEM	size = 32
+	_allocmem                       
+
+ASSERT  	size = 30
+	___assertfail                   
+
+ATEXIT  	size = 102
+	__atexitcnt                       __atexittbl
+	_atexit                         
+
+ATOL    	size = 124
+	_atoi                             _atol
+
+BCD1    	size = 524
+	__BCD_LOG10                       __BCD_POW10
+	__BCD_TOBINARY                    __BCD_TODECIMAL
+
+BCD2    	size = 118
+	operator <<(ostream near&,bcd near&)  operator >>(istream near&,bcd near&)
+
+BDOS    	size = 16
+	_bdos                           
+
+BDOSPTR 	size = 25
+	_bdosptr                        
+
+BIOSCOM 	size = 16
+	_bioscom                        
+
+BIOSDISK	size = 58
+	_biosdisk                       
+
+BIOSEQU 	size = 25
+	_biosequip                        _biosmemory
+	_biostime                       
+
+BIOSKEY 	size = 37
+	_bioskey                        
+
+BIOSPRIN	size = 20
+	_biosprint                      
+
+BIOS_COM	size = 16
+	__bios_serialcom                
+
+BIOS_DSK	size = 42
+	__bios_disk                     
+
+BIOS_EQU	size = 35
+	__bios_equiplist                  __bios_memsize
+	__bios_timeofday                
+
+BIOS_KEY	size = 37
+	__bios_keybrd                   
+
+BIOS_PRN	size = 20
+	__bios_printer                  
+
+BRK     	size = 111
+	___brk                            ___sbrk
+	_brk                              _sbrk
+
+BSEARCH 	size = 86
+	_bsearch                        
+
+CALLOC  	size = 77
+	_calloc                         
+
+CASTMPTR	size = 174
+	_cast_memptr(void far*,void far*,unsigned int,unsigned int,unsigned int)
+
+CGETS   	size = 145
+	_cgets                          
+
+CHAININT	size = 24
+	__chain_intr                    
+
+CHDIR   	size = 22
+	_chdir                          
+
+CHDRIVE 	size = 66
+	__chdrive                         __getdrive
+
+CHMOD   	size = 64
+	_chmod                          
+
+CHMODA  	size = 27
+	__chmod                         
+
+CHSIZE  	size = 195
+	_chsize                         
+
+CLEARERR	size = 14
+	_clearerr                       
+
+CLOCK   	size = 74
+	_clock                          
+
+CLOSE   	size = 38
+	_close                          
+
+CLOSEA  	size = 30
+	__close                         
+
+CLOSEALL	size = 80
+	_fcloseall                      
+
+CLREOL  	size = 47
+	_clreol                         
+
+CLRSCR  	size = 41
+	_clrscr                         
+
+COLOR   	size = 76
+	_highvideo                        _lowvideo
+	_normvideo                        _textattr
+	_textbackground                   _textcolor
+
+CONSTREA	size = 1779
+	clreol(ostream near&)             conbuf::conbuf()
+	conbuf::current                   conbuf::makeActive()
+	conbuf::makeInactive()            conbuf::overflow(int)
+	conbuf::swap()                    constream::constream()
+	constream::isCon_                 delline(ostream near&)
+	highvideo(ostream near&)          insline(ostream near&)
+	lowvideo(ostream near&)           normvideo(ostream near&)
+	setattr(int)                      setbk(int)
+	setclr(int)                       setcrsrtype(int)
+	setxy(int,int)                  
+
+CORELEFT	size = 16
+	_coreleft                       
+
+COUNTRY 	size = 24
+	_country                        
+
+CPLX1   	size = 276
+	operator *(complex near&,complex near&)  abs(complex near&)
+	complex::operator *=(complex near&)  norm(complex near&)
+
+CPLX2   	size = 4621
+	operator /(double,complex near&)  operator /(complex near&,complex near&)
+	operator <<(ostream near&,complex near&)  operator >>(istream near&,complex near&)
+	acos(complex near&)               arg(complex near&)
+	asin(complex near&)               atan(complex near&)
+	complex::operator /=(complex near&)  cos(complex near&)
+	cosh(complex near&)               exp(complex near&)
+	log(complex near&)                log10(complex near&)
+	pow(double,complex near&)         pow(complex near&,double)
+	pow(complex near&,complex near&)  sin(complex near&)
+	sinh(complex near&)               sqrt(complex near&)
+	tan(complex near&)                tanh(complex near&)
+
+CPRINTF 	size = 329
+	__CPUTN                           _cprintf
+
+CPUTS   	size = 21
+	_cputs                          
+
+CREAT   	size = 131
+	_creat                          
+
+CREATA  	size = 112
+	__creat                           _creatnew
+	_creattemp                      
+
+CRTINIT 	size = 465
+	__VideoInt                        __c0crtinit
+	__crtinit                         __turboCrt
+	__video                           _directvideo
+
+CSCANF  	size = 29
+	_cscanf                         
+
+CTIME   	size = 2512
+	_asctime                          _ctime
+	_gmtime                           _localtime
+	_mktime                           _strftime
+
+CTRLBRK 	size = 69
+	_ctrlbrk                        
+
+CTYPE   	size = 257
+	__ctype                         
+
+CURSOR  	size = 135
+	__setcursortype                 
+
+CVTFAK  	size = 88
+	__cvtfak                        
+
+DDVT    	size = 82
+	_DDVTdispatch(void near*,int)     _DDVTdispatchNULL(void near*,int)
+
+DEL     	size = 12
+	operator delete(void near*)     
+
+DELAY   	size = 167
+	_delay                          
+
+DELF    	size = 32
+	operator delete(void far*)      
+
+DIRECT  	size = 294
+	_closedir                         _opendir
+	_readdir                          _rewinddir
+
+DIVT    	size = 12
+	_div                            
+
+DOSALLOC	size = 31
+	__dos_allocmem                  
+
+DOSCLOSE	size = 22
+	__dos_close                     
+
+DOSCMD  	size = 163
+	__DOSCMD                        
+
+DOSCREAT	size = 75
+	__dos_creat                       __dos_creatnew
+
+DOSDFREE	size = 54
+	__dos_getdiskfree               
+
+DOSENV  	size = 211
+	__DOSENV                        
+
+DOSEXT  	size = 34
+	_dosexterr                      
+
+DOSFATTR	size = 56
+	__dos_getfileattr                 __dos_setfileattr
+
+DOSFIND 	size = 96
+	__dos_findfirst                   __dos_findnext
+
+DOSFREE 	size = 22
+	__dos_freemem                   
+
+DOSGDATE	size = 50
+	__dos_getdate                     __dos_gettime
+
+DOSGDRIV	size = 42
+	__dos_getdrive                    __dos_setdrive
+
+DOSGFTIM	size = 37
+	__dos_getftime                  
+
+DOSKEEP 	size = 18
+	__dos_keep                      
+
+DOSLOCK 	size = 78
+	__dos_lock                        __dos_unlock
+
+DOSOPEN 	size = 51
+	__dos_open                      
+
+DOSREAD 	size = 35
+	__dos_read                      
+
+DOSSDATE	size = 81
+	__dos_setdate                     __dos_settime
+
+DOSSEEK 	size = 39
+	__dos_seek                      
+
+DOSSETBL	size = 29
+	__dos_setblock                  
+
+DOSSFTIM	size = 29
+	__dos_setftime                  
+
+DOSTIMU 	size = 214
+	__DOSTIMETOU                    
+
+DOSVECT 	size = 32
+	__dos_getvect                     __dos_setvect
+
+DOSWRITE	size = 35
+	__dos_write                     
+
+DUP2    	size = 96
+	_dup                              _dup2
+
+EOF     	size = 119
+	_eof                            
+
+ERRORMSG	size = 27
+	___ErrorMessage                 
+
+EXEC    	size = 916
+	__exec                          
+
+EXECL   	size = 26
+	_execl                          
+
+EXECLE  	size = 42
+	_execle                         
+
+EXECLP  	size = 29
+	_execlp                         
+
+EXECLPE 	size = 43
+	_execlpe                        
+
+EXECV   	size = 25
+	_execv                          
+
+EXECVE  	size = 27
+	_execve                         
+
+EXECVP  	size = 28
+	_execvp                         
+
+EXECVPE 	size = 28
+	_execvpe                        
+
+EXIT    	size = 143
+	__c_exit                          __cexit
+	__exit                            __exitbuf
+	__exitfopen                       __exitopen
+	_exit                           
+
+FARHEAP 	size = 1052
+	___first                          ___last
+	___rover                          _farfree
+	_farmalloc                        _farrealloc
+
+FBRK    	size = 323
+	__brk                             __sbrk
+
+FCALLOC 	size = 157
+	_farcalloc                      
+
+FCLOSE  	size = 117
+	_fclose                         
+
+FCORELFT	size = 80
+	_farcoreleft                    
+
+FDDVT   	size = 83
+	_DDVTdispatch(void far*,int)      _DDVTdispatchNULL(void far*,int)
+
+FDOPEN  	size = 43
+	_fdopen                         
+
+FFLUSH  	size = 125
+	_fflush                         
+
+FFMALLOC	size = 16
+	__ffarmalloc                    
+
+FGETPOS 	size = 37
+	_fgetpos                        
+
+FGETS   	size = 96
+	_fgets                          
+
+FHEAPCHK	size = 637
+	_farheapcheck                     _farheapcheckfree
+	_farheapchecknode                 _farheapfillfree
+	_farheapwalk                    
+
+FILES   	size = 320
+	__streams                       
+
+FILES2  	size = 42
+	__nfile                           __openfd
+
+FINDFIRS	size = 96
+	_findfirst                        _findnext
+
+FLENGTH 	size = 65
+	_filelength                     
+
+FLUSHALL	size = 56
+	_flushall                       
+
+FMEMCCPY	size = 57
+	__fmemccpy                      
+
+FMEMCHR 	size = 35
+	__fmemchr                       
+
+FMEMCMP 	size = 40
+	__fmemcmp                       
+
+FMEMCPY 	size = 36
+	__fmemcpy                       
+
+FMEMICMP	size = 71
+	__fmemicmp                      
+
+FMEMSET 	size = 67
+	__fmemset                         __fsetmem
+
+FMODE   	size = 4
+	__fmode                           __notUmask
+
+FMOVMEM 	size = 115
+	__fmemmove                        __fmovmem
+
+FNMERGE 	size = 26
+	_fnmerge                        
+
+FNSPLIT 	size = 26
+	_fnsplit                        
+
+FOPEN   	size = 402
+	__GETFP                           __OPENFP
+	_fopen                          
+
+FPRINTF 	size = 22
+	_fprintf                        
+
+FPSTKLEN	size = 2
+	__fpstklen                      
+
+FPUTS   	size = 55
+	_fputs                          
+
+FREAD   	size = 286
+	_fread                          
+
+FREEMEM 	size = 22
+	_freemem                        
+
+FREOPEN 	size = 37
+	_freopen                        
+
+FSATTCH 	size = 60
+	fstreambase::attach(int)        
+
+FSBATTCH	size = 153
+	filebuf::attach(int)            
+
+FSBCLOSE	size = 119
+	filebuf::close()                
+
+FSBCTR1 	size = 159
+	filebuf::filebuf()              
+
+FSBCTR2 	size = 160
+	filebuf::filebuf(int)           
+
+FSBCTR3 	size = 102
+	filebuf::filebuf(int,char near*,int)
+
+FSBDTR  	size = 92
+	filebuf::~filebuf()               filebuf::openprot
+
+FSBOFLOW	size = 252
+	filebuf::overflow(int)          
+
+FSBOPEN 	size = 271
+	filebuf::open(const char near*,int,int)
+
+FSBSBUF 	size = 131
+	filebuf::setbuf(char near*,int) 
+
+FSBSKOFF	size = 295
+	filebuf::seekoff(long,seek_dir,int)
+
+FSBSYNC 	size = 153
+	filebuf::sync()                 
+
+FSBUFLOW	size = 335
+	filebuf::underflow()            
+
+FSCANF  	size = 29
+	_fscanf                         
+
+FSCLOSE 	size = 45
+	fstreambase::close()            
+
+FSCTR1  	size = 104
+	fstreambase::fstreambase()      
+
+FSCTR2  	size = 120
+	fstreambase::fstreambase(const char near*,int,int)
+
+FSCTR3  	size = 108
+	fstreambase::fstreambase(int)   
+
+FSCTR4  	size = 115
+	fstreambase::fstreambase(int,char near*,int)
+
+FSDTR   	size = 90
+	fstreambase::~fstreambase()     
+
+FSEEK   	size = 268
+	_fseek                            _ftell
+
+FSETPOS 	size = 25
+	_fsetpos                        
+
+FSOPEN  	size = 86
+	fstreambase::open(const char near*,int,int)
+
+FSSBUF  	size = 56
+	fstreambase::setbuf(char near*,int)
+
+FSTAT   	size = 148
+	_fstat                          
+
+FSTRCAT 	size = 63
+	__fstrcat                       
+
+FSTRCHR 	size = 61
+	__fstrchr                       
+
+FSTRCMP 	size = 48
+	__fstrcmp                       
+
+FSTRCPY 	size = 41
+	__fstrcpy                       
+
+FSTRCSPN	size = 69
+	__fstrcspn                      
+
+FSTRDUP 	size = 76
+	__fstrdup                       
+
+FSTRICMP	size = 65
+	__fstricmp                      
+
+FSTRLEN 	size = 31
+	__fstrlen                       
+
+FSTRLWR 	size = 36
+	__fstrlwr                       
+
+FSTRNCAT	size = 99
+	__fstrncat                      
+
+FSTRNCMP	size = 56
+	__fstrncmp                      
+
+FSTRNCPY	size = 49
+	__fstrncpy                      
+
+FSTRNICM	size = 68
+	__fstrnicmp                     
+
+FSTRNSET	size = 56
+	__fstrnset                      
+
+FSTRPBRK	size = 76
+	__fstrpbrk                      
+
+FSTRRCHR	size = 73
+	__fstrrchr                      
+
+FSTRREV 	size = 52
+	__fstrrev                       
+
+FSTRSET 	size = 43
+	__fstrset                       
+
+FSTRSPN 	size = 78
+	__fstrspn                       
+
+FSTRSTR 	size = 110
+	__fstrstr                       
+
+FSTRTOK 	size = 203
+	__fstrtok                       
+
+FSTRUPR 	size = 36
+	__fstrupr                       
+
+FTIME   	size = 167
+	_ftime                          
+
+FTOLOWER	size = 44
+	__ftolower                      
+
+FTOUPPER	size = 44
+	__ftoupper                      
+
+FULLPATH	size = 411
+	__fullpath                      
+
+FWRITE  	size = 76
+	_fwrite                         
+
+F_LXMUL 	size = 23
+	F_LXMUL@                          LXMUL@
+
+F_PCMP  	size = 33
+	F_PCMP@                           PCMP@
+
+F_SCOPY 	size = 28
+	F_SCOPY@                          SCOPY@
+
+GETC    	size = 324
+	__Nfgetc                          __fgetc
+	_fgetc                            _fgetchar
+
+GETCBRK 	size = 27
+	_getcbrk                          _setcbrk
+
+GETCH   	size = 82
+	__Ngetche                         __Nungetch
+	_getch                            _getche
+	_ungetch                        
+
+GETCURDI	size = 27
+	_getcurdir                      
+
+GETCWD  	size = 112
+	_getcwd                         
+
+GETDATE 	size = 38
+	_getdate                          _gettime
+
+GETDCWD 	size = 127
+	__getdcwd                       
+
+GETDISK 	size = 49
+	_getdisk                          _setdisk
+
+GETDTA  	size = 9
+	_getdta                         
+
+GETENV  	size = 95
+	_getenv                         
+
+GETFAT  	size = 84
+	_getdfree                         _getfat
+	_getfatd                        
+
+GETFTIME	size = 33
+	_getftime                       
+
+GETPASS 	size = 134
+	_getpass                        
+
+GETPSP  	size = 7
+	_getpsp                         
+
+GETS    	size = 89
+	_gets                           
+
+GETSWIT 	size = 23
+	_getswitchar                      _setswitchar
+
+GETVECT 	size = 32
+	_getvect                          _setvect
+
+GETVERF 	size = 20
+	_getverify                        _setverify
+
+GETW    	size = 91
+	_getw                           
+
+GEXIT   	size = 12
+	__graphexit                     
+
+GFREEMEM	size = 12
+	__graphfreemem                  
+
+GGETMEM 	size = 14
+	__graphgetmem                   
+
+GOTOXY  	size = 73
+	_gotoxy                         
+
+GPTEXT  	size = 149
+	_gettext                          _puttext
+
+GREGISTR	size = 32
+	_registerbgidriver                _registerbgifont
+
+HARD    	size = 36
+	_harderr                          _hardresume
+	_hardretn                       
+
+HARDERR 	size = 287
+	___harderr                        __harderr
+	__hardresume                      __hardretn
+
+HEAPLEN 	size = 2
+	__heaplen                       
+
+HQSORT  	size = 890
+	__hqsort                        
+
+H_LDIV  	size = 174
+	F_LDIV@                           F_LMOD@
+	F_LUDIV@                          F_LUMOD@
+	LDIV@                             LMOD@
+	LUDIV@                            LUMOD@
+	N_LDIV@                           N_LMOD@
+	N_LUDIV@                          N_LUMOD@
+
+H_LLSH  	size = 33
+	F_LXLSH@                          LXLSH@
+	N_LXLSH@                        
+
+H_LRSH  	size = 32
+	F_LXRSH@                          LXRSH@
+	N_LXRSH@                        
+
+H_LURSH 	size = 33
+	F_LXURSH@                         LXURSH@
+	N_LXURSH@                       
+
+H_PADA  	size = 136
+	F_PADA@                           F_PSBA@
+	N_PADA@                           N_PSBA@
+	PADA@                             PSBA@
+
+H_PADD  	size = 96
+	F_PADD@                           F_PSUB@
+	N_PADD@                           N_PSUB@
+	PADD@                             PSUB@
+
+H_PINA  	size = 102
+	F_PDEA@                           F_PINA@
+	N_PDEA@                           N_PINA@
+	PDEA@                             PINA@
+
+H_PSBH  	size = 32
+	F_PSBH@                           N_PSBH@
+
+H_PSBP  	size = 40
+	F_PSBP@                           N_PSBP@
+	PSBP@                           
+
+H_SPUSH 	size = 39
+	F_SPUSH@                          N_SPUSH@
+	SPUSH@                          
+
+IFSCTR1 	size = 131
+	ifstream::ifstream()            
+
+IFSCTR2 	size = 145
+	ifstream::ifstream(const char near*,int,int)
+
+IFSCTR3 	size = 135
+	ifstream::ifstream(int)         
+
+IFSCTR4 	size = 141
+	ifstream::ifstream(int,char near*,int)
+
+IFSDTR  	size = 115
+	ifstream::~ifstream()           
+
+INPORT  	size = 40
+	_inp                              _inport
+	_inportb                          _inpw
+
+INSLINE 	size = 60
+	_delline                          _insline
+
+INT86   	size = 193
+	_int86                            _int86x
+
+INTDOS  	size = 133
+	_intdos                           _intdosx
+
+INTR    	size = 164
+	_intr                           
+
+IOCTL   	size = 39
+	_ioctl                          
+
+IOERROR 	size = 166
+	__DOSERROR                        __IOERROR
+	__dosErrorToSV                    __doserrno
+
+IOFSCTR1	size = 156
+	fstream::fstream()              
+
+IOFSCTR2	size = 166
+	fstream::fstream(const char near*,int,int)
+
+IOFSCTR3	size = 160
+	fstream::fstream(int)           
+
+IOFSCTR4	size = 166
+	fstream::fstream(int,char near*,int)
+
+IOFSDTR 	size = 132
+	fstream::~fstream()             
+
+IOSRCTR1	size = 163
+	strstream::strstream()          
+
+IOSRCTR2	size = 216
+	strstream::strstream(char near*,int,int)
+
+IOSRDTR 	size = 132
+	strstream::~strstream()         
+
+IOSTASN1	size = 27
+	iostream_withassign::operator =(ios near&)
+
+IOSTASN2	size = 22
+	iostream_withassign::operator =(streambuf near*)
+
+IOSTCTR1	size = 140
+	iostream::iostream(streambuf near*)
+
+IOSTCTR2	size = 131
+	iostream::iostream()            
+
+IOSTCTR3	size = 116
+	iostream_withassign::iostream_withassign()
+
+IOSTDTR1	size = 115
+	iostream::~iostream()           
+
+IOSTDTR2	size = 101
+	iostream_withassign::~iostream_withassign()
+
+IOSTSTD 	size = 596
+	Iostream_delete()                 _cerr
+	_cin                              _clog
+	_cout                           
+
+IS      	size = 401
+	_feof                             _ferror
+	_getc                             _getchar
+	_isalnum                          _isalpha
+	_isascii                          _iscntrl
+	_isdigit                          _isgraph
+	_islower                          _isprint
+	_ispunct                          _isspace
+	_isupper                          _isxdigit
+	_putc                             _putchar
+
+ISATTY  	size = 17
+	_isatty                         
+
+ISRCTR1 	size = 146
+	istrstream::istrstream(char near*)
+
+ISRCTR2 	size = 148
+	istrstream::istrstream(char near*,int)
+
+ISRDTR  	size = 115
+	istrstream::~istrstream()       
+
+ISTASN1 	size = 29
+	istream_withassign::operator =(istream near&)
+
+ISTASN2 	size = 22
+	istream_withassign::operator =(streambuf near*)
+
+ISTCTR1 	size = 86
+	istream::istream()              
+
+ISTCTR2 	size = 95
+	istream::istream(streambuf near*)
+
+ISTCTR3 	size = 115
+	istream::istream(streambuf near*,int,ostream near*)
+
+ISTCTR4 	size = 91
+	istream_withassign::istream_withassign()
+
+ISTDGET 	size = 102
+	istream::do_get()               
+
+ISTDIPFX	size = 123
+	istream::ipfx(int)              
+
+ISTDTR1 	size = 75
+	istream::~istream()             
+
+ISTDTR2 	size = 84
+	istream_withassign::~istream_withassign()
+
+ISTEATWH	size = 135
+	istream::eatwhite()             
+
+ISTEBUF 	size = 237
+	istream::operator >>(streambuf near*)
+
+ISTECHP 	size = 222
+	istream::operator >>(char near*)
+
+ISTEDBL 	size = 109
+	istream::operator >>(double near&)
+
+ISTEFLT 	size = 137
+	istream::operator >>(float near&)
+
+ISTEINT 	size = 46
+	istream::operator >>(int near&) 
+
+ISTELDBL	size = 1499
+	istream::operator >>(long double near&)
+
+ISTELNG 	size = 978
+	istream::operator >>(long near&)
+
+ISTESCHR	size = 135
+	istream::operator >>(char near&)
+
+ISTESH  	size = 46
+	istream::operator >>(short near&)
+
+ISTEUCHR	size = 135
+	istream::operator >>(unsigned char near&)
+
+ISTEUINT	size = 46
+	istream::operator >>(unsigned int near&)
+
+ISTEULNG	size = 50
+	istream::operator >>(unsigned long near&)
+
+ISTEUSH 	size = 46
+	istream::operator >>(unsigned short near&)
+
+ISTGBUF 	size = 246
+	istream::get(streambuf near&,char)
+
+ISTGET  	size = 115
+	istream::get()                  
+
+ISTGLINE	size = 198
+	istream::getline(char near*,int,char)
+
+ISTGSCHR	size = 146
+	istream::get(char near&)        
+
+ISTGSTR 	size = 200
+	istream::get(char near*,int,char)
+
+ISTGUCHR	size = 146
+	istream::get(unsigned char near&)
+
+ISTIGN  	size = 159
+	istream::ignore(int,int)        
+
+ISTMANIP	size = 18
+	istream::operator >>(ios near&(near*)(ios near&))
+
+ISTPBACK	size = 109
+	istream::putback(char)          
+
+ISTREAD 	size = 184
+	istream::read(char near*,int)   
+
+ISTSKOFF	size = 69
+	istream::seekg(long,seek_dir)   
+
+ISTSKPOS	size = 66
+	istream::seekg(long)            
+
+ISTTELLG	size = 90
+	istream::tellg()                
+
+ISTWS   	size = 70
+	ws(istream near&)               
+
+ISTX    	size = 219
+	istream::istream(int,int,ostream near*)  istream::istream(int,char near*,int)
+
+KBHIT   	size = 20
+	__cChar                           __cFlag
+	_kbhit                          
+
+KEEP    	size = 18
+	_keep                           
+
+LABS    	size = 40
+	_labs                           
+
+LDIVT   	size = 152
+	_ldiv                           
+
+LOADPROG	size = 145
+	__LoadProg                      
+
+LOCALE  	size = 91
+	_localeconv                       _setlocale
+
+LOCK    	size = 78
+	_lock                             _unlock
+
+LOCKING 	size = 274
+	_locking                        
+
+LONGTOA 	size = 154
+	__LONGTOA                         __UTOA
+
+LROTL   	size = 28
+	__lrotl                         
+
+LROTR   	size = 29
+	__lrotr                         
+
+LSEARCH 	size = 125
+	_lfind                            _lsearch
+
+LSEEK   	size = 41
+	_lseek                          
+
+LTOA1   	size = 103
+	_itoa                             _ltoa
+	_ultoa                          
+
+MAKEPATH	size = 124
+	__makepath                      
+
+MEMCCPY 	size = 53
+	_memccpy                        
+
+MEMCHR  	size = 31
+	_memchr                         
+
+MEMCMP  	size = 41
+	_memcmp                         
+
+MEMCPY  	size = 31
+	_memcpy                         
+
+MEMICMP 	size = 63
+	_memicmp                        
+
+MEMSET  	size = 64
+	_memset                           _setmem
+
+MKDIR   	size = 22
+	_mkdir                          
+
+MKNAME  	size = 146
+	__MKNAME                          __TMPNAM
+
+MKTEMP  	size = 196
+	_mktemp                         
+
+MNRSTFLG	size = 102
+	resetiosflags(long)             
+
+MNSBASE 	size = 165
+	setbase(int)                    
+
+MNSETFLG	size = 102
+	setiosflags(long)               
+
+MNSETW  	size = 91
+	setw(int)                       
+
+MNSFILL 	size = 92
+	setfill(int)                    
+
+MNSPREC 	size = 91
+	setprecision(int)               
+
+MOVEDATA	size = 34
+	_movedata                       
+
+MOVETEXT	size = 157
+	_movetext                       
+
+MOVMEM  	size = 98
+	_memmove                          _movmem
+
+MULTBYTE	size = 185
+	_mblen                            _mbstowcs
+	_mbtowc                           _wcstombs
+	_wctomb                         
+
+NEARHEAP	size = 637
+	__first                           __last
+	__rover                           _free
+	_malloc                           _realloc
+
+NEW     	size = 83
+	operator new(unsigned int)        set_new_handler(void(near*)())
+	__new_handler                   
+
+NEWF    	size = 77
+	operator new(unsigned long)     
+
+NHEAPCHK	size = 500
+	_heapcheck                        _heapcheckfree
+	_heapchecknode                    _heapfillfree
+	_heapwalk                       
+
+N_LXMUL 	size = 23
+	N_LXMUL@                        
+
+N_PCMP  	size = 33
+	N_PCMP@                         
+
+N_SCOPY 	size = 28
+	N_SCOPY@                        
+
+OFSCTR1 	size = 131
+	ofstream::ofstream()            
+
+OFSCTR2 	size = 145
+	ofstream::ofstream(const char near*,int,int)
+
+OFSCTR3 	size = 135
+	ofstream::ofstream(int)         
+
+OFSCTR4 	size = 141
+	ofstream::ofstream(int,char near*,int)
+
+OFSDTR  	size = 115
+	ofstream::~ofstream()           
+
+OPEN    	size = 375
+	_open                           
+
+OPENA   	size = 77
+	__open                          
+
+OSRCTR1 	size = 191
+	ostrstream::ostrstream(char near*,int,int)
+
+OSRCTR2 	size = 138
+	ostrstream::ostrstream()        
+
+OSRDTR  	size = 115
+	ostrstream::~ostrstream()       
+
+OSTASN1 	size = 29
+	ostream_withassign::operator =(ostream near&)
+
+OSTASN2 	size = 22
+	ostream_withassign::operator =(streambuf near*)
+
+OSTCTR1 	size = 81
+	ostream::ostream()              
+
+OSTCTR2 	size = 90
+	ostream::ostream(streambuf near*)
+
+OSTCTR3 	size = 91
+	ostream_withassign::ostream_withassign()
+
+OSTDTR1 	size = 80
+	ostream::~ostream()             
+
+OSTDTR2 	size = 84
+	ostream_withassign::~ostream_withassign()
+
+OSTENDL 	size = 26
+	endl(ostream near&)             
+
+OSTENDS 	size = 21
+	ends(ostream near&)             
+
+OSTFLOAT	size = 1600
+	fpclass(long double)              fpcopysign(long double,long double)
+	ostream::operator <<(long double)
+
+OSTFLUSH	size = 42
+	ostream::flush()                
+
+OSTIBUF 	size = 189
+	ostream::operator <<(streambuf near*)
+
+OSTINT  	size = 709
+	ostream::operator <<(long)        ostream::operator <<(unsigned long)
+
+OSTISCHR	size = 131
+	ostream::operator <<(char)      
+
+OSTMANIP	size = 18
+	ostream::operator <<(ios near&(near*)(ios near&))
+
+OSTMFLSH	size = 17
+	flush(ostream near&)            
+
+OSTOPFX 	size = 39
+	ostream::do_opfx()              
+
+OSTOSFX 	size = 56
+	ostream::do_osfx()              
+
+OSTOUTST	size = 508
+	ostream::outstr(const char near*,const char near*)
+
+OSTPTR  	size = 79
+	ostream::operator <<(void near*)
+
+OSTSKOFF	size = 69
+	ostream::seekp(long,seek_dir)   
+
+OSTSKPOS	size = 66
+	ostream::seekp(long)            
+
+OSTTELLP	size = 93
+	ostream::tellp()                
+
+OSTWRITE	size = 54
+	ostream::write(const char near*,int)
+
+OSTX    	size = 193
+	ostream::ostream(int)             ostream::ostream(int,char near*)
+
+OUTPORT 	size = 50
+	_outp                             _outport
+	_outportb                         _outpw
+
+PARSFNM 	size = 34
+	_parsfnm                        
+
+PEEK    	size = 32
+	_peek                             _peekb
+
+PERROR  	size = 656
+	_perror                           _sys_errlist
+	_sys_nerr                       
+
+POKE    	size = 38
+	_poke                             _pokeb
+
+PRINTF  	size = 23
+	_printf                         
+
+PUREERR 	size = 92
+	__fpure_error_                    __npure_error_
+
+PUTC    	size = 736
+	__FPUTN                           __fputc
+	_fputc                            _fputchar
+
+PUTCH   	size = 19
+	_putch                          
+
+PUTENV  	size = 195
+	_putenv                         
+
+PUTS    	size = 71
+	_puts                           
+
+PUTW    	size = 88
+	_putw                           
+
+QSORT   	size = 496
+	_qsort                          
+
+RAND    	size = 59
+	_rand                             _srand
+
+RANDBLK 	size = 32
+	_randbrd                          _randbwr
+
+READ    	size = 200
+	___read                         
+
+READA   	size = 45
+	__read                          
+
+READU   	size = 3
+	_read                           
+
+REALCVT 	size = 4
+	__REALCVT                       
+
+REMOVE  	size = 22
+	_remove                         
+
+RENAME  	size = 29
+	_rename                         
+
+REWIND  	size = 30
+	_rewind                         
+
+RMDIR   	size = 22
+	_rmdir                          
+
+RMTMP   	size = 62
+	_rmtmp                          
+
+ROTL    	size = 13
+	__rotl                          
+
+ROTR    	size = 13
+	__rotr                          
+
+SCANF   	size = 30
+	_scanf                          
+
+SCANNER 	size = 1301
+	__scanner                       
+
+SCANTOD 	size = 12
+	__scanpop                         __scanrslt
+	__scantod                       
+
+SCANTOL 	size = 426
+	__scantol                       
+
+SCREEN  	size = 427
+	__SCREENIO                        __VALIDATEXY
+
+SCROLL  	size = 382
+	__SCROLL                        
+
+SDBCTR  	size = 140
+	stdiobuf::stdiobuf(FILE near*)  
+
+SDBDTR  	size = 77
+	stdiobuf::~stdiobuf()           
+
+SDBOFLOW	size = 215
+	stdiobuf::overflow(int)         
+
+SDBPBFL 	size = 21
+	stdiobuf::pbackfail(int)        
+
+SDBSKOFF	size = 201
+	stdiobuf::seekoff(long,seek_dir,int)
+
+SDBSYNC 	size = 164
+	stdiobuf::sync()                
+
+SDBUFLOW	size = 257
+	stdiobuf::underflow()           
+
+SDCTR   	size = 67
+	stdiostream::stdiostream(FILE near*)
+
+SDDTR   	size = 60
+	stdiostream::~stdiostream()     
+
+SEARCHP 	size = 834
+	__SEARCHPATH                      __searchenv
+
+SEGREAD 	size = 21
+	_segread                        
+
+SETARGV 	size = 295
+	__argc                            __argv
+	__setargv__                     
+
+SETBLOCK	size = 28
+	_setblock                       
+
+SETBUF  	size = 34
+	_setbuf                         
+
+SETDATE 	size = 38
+	_setdate                          _settime
+
+SETDTA  	size = 14
+	_setdta                         
+
+SETENVP 	size = 95
+	__setenvp__                       _environ
+
+SETFTIME	size = 33
+	_setftime                       
+
+SETJMP  	size = 107
+	_longjmp                          _setjmp
+
+SETMODE 	size = 79
+	_setmode                        
+
+SETUPIO 	size = 163
+	__setupio                       
+
+SETVBUF 	size = 206
+	_setvbuf                        
+
+SIGDATA 	size = 2
+	___SignalPtr                    
+
+SIGNAL  	size = 838
+	_raise                            _signal
+
+SLEEP   	size = 93
+	_sleep                          
+
+SOPEN   	size = 48
+	_sopen                          
+
+SOUND   	size = 51
+	_nosound                          _sound
+
+SPAWN   	size = 197
+	__spawn                         
+
+SPAWNL  	size = 66
+	_spawnl                         
+
+SPAWNLE 	size = 83
+	_spawnle                        
+
+SPAWNLP 	size = 72
+	_spawnlp                        
+
+SPAWNLPE	size = 85
+	_spawnlpe                       
+
+SPAWNV  	size = 63
+	_spawnv                         
+
+SPAWNVE 	size = 66
+	_spawnve                        
+
+SPAWNVP 	size = 69
+	_spawnvp                        
+
+SPAWNVPE	size = 68
+	_spawnvpe                       
+
+SPLITPTH	size = 542
+	__fnsplit                         __splitpath
+
+SPRINTF 	size = 95
+	_sprintf                          _vsprintf
+
+SRBCTR1 	size = 81
+	strstreambuf::strstreambuf()    
+
+SRBCTR2 	size = 83
+	strstreambuf::strstreambuf(void near*(near*)(long),void(near*)(void near*))
+
+SRBCTR3 	size = 132
+	strstreambuf::strstreambuf(int) 
+
+SRBCTR4 	size = 77
+	strstreambuf::strstreambuf(char near*,int,char near*)
+
+SRBCTR5 	size = 77
+	strstreambuf::strstreambuf(unsigned char near*,int,unsigned char near*)
+
+SRBDALC 	size = 96
+	strstreambuf::doallocate()      
+
+SRBDTR  	size = 97
+	strstreambuf::~strstreambuf()   
+
+SRBFREEZ	size = 33
+	strstreambuf::freeze(int)       
+
+SRBINIT 	size = 132
+	strstreambuf::init(char near*,int,char near*)
+
+SRBOFLOW	size = 323
+	strstreambuf::overflow(int)     
+
+SRBSBUF 	size = 33
+	strstreambuf::setbuf(char near*,int)
+
+SRBSKOFF	size = 428
+	strstreambuf::seekoff(long,seek_dir,int)
+
+SRBSTR  	size = 23
+	strstreambuf::str()             
+
+SRBSYNC 	size = 10
+	strstreambuf::sync()            
+
+SRBUFLOW	size = 99
+	strstreambuf::underflow()       
+
+SRCHPATH	size = 15
+	_searchpath                     
+
+SRCTR1  	size = 115
+	strstreambase::strstreambase(char near*,int,char near*)
+
+SRCTR2  	size = 104
+	strstreambase::strstreambase()  
+
+SRDTR   	size = 90
+	strstreambase::~strstreambase() 
+
+SSCANF  	size = 102
+	_sscanf                           _vsscanf
+
+STACK   	size = 36
+	F_OVERFLOW@                       N_OVERFLOW@
+	OVERFLOW@                       
+
+STAT    	size = 304
+	_stat                           
+
+STBALC  	size = 48
+	streambuf::doallocate()         
+
+STBCTR1 	size = 106
+	streambuf::streambuf()          
+
+STBCTR2 	size = 122
+	streambuf::streambuf(char near*,int)
+
+STBDBP  	size = 319
+	streambuf::dbp()                
+
+STBDNEXT	size = 34
+	streambuf::do_snextc()          
+
+STBDSGTN	size = 136
+	streambuf::do_sgetn(char near*,int)
+
+STBDSPTN	size = 124
+	streambuf::do_sputn(const char near*,int)
+
+STBDTR  	size = 69
+	streambuf::~streambuf()         
+
+STBOFLOW	size = 11
+	streambuf::overflow(int)        
+
+STBPBFL 	size = 11
+	streambuf::pbackfail(int)       
+
+STBSBUF 	size = 32
+	streambuf::setbuf(char near*,int)
+
+STBSETB 	size = 101
+	streambuf::setb(char near*,char near*,int)
+
+STBSETG 	size = 60
+	streambuf::setg(char near*,char near*,char near*)
+
+STBSETP 	size = 45
+	streambuf::setp(char near*,char near*)
+
+STBSGETN	size = 68
+	streambuf::sgetn(char near*,int)
+
+STBSKOFF	size = 14
+	streambuf::seekoff(long,seek_dir,int)
+
+STBSKPOS	size = 31
+	streambuf::seekpos(long,int)    
+
+STBSPUTN	size = 68
+	streambuf::sputn(const char near*,int)
+
+STBSTB1 	size = 53
+	streambuf::setbuf(char near*,int,int)
+
+STBSYNC 	size = 56
+	streambuf::sync()               
+
+STBTALC 	size = 45
+	ios::bitalloc()                 
+
+STBUFLOW	size = 36
+	streambuf::underflow()          
+
+STCLEAR 	size = 52
+	ios::clear(int)                 
+
+STCTR1  	size = 41
+	ios::ios()                      
+
+STCTR2  	size = 50
+	ios::ios(streambuf near*)       
+
+STDEC   	size = 34
+	dec(ios near&)                  
+
+STDTR   	size = 69
+	ios::~ios()                       ios::adjustfield
+	ios::basefield                    ios::floatfield
+	ios::nextbit                      ios::stdioflush
+	ios::usercount                  
+
+STFLAGS 	size = 64
+	ios::flags(long)                
+
+STHEX   	size = 34
+	hex(ios near&)                  
+
+STIME   	size = 121
+	_stime                            _time
+
+STINIT  	size = 62
+	ios::init(streambuf near*)      
+
+STIWORD 	size = 71
+	ios::iword(int)                 
+
+STKAVAIL	size = 17
+	_stackavail                     
+
+STKLEN  	size = 2
+	__stklen                        
+
+STOCT   	size = 34
+	oct(ios near&)                  
+
+STPCPY  	size = 37
+	_stpcpy                         
+
+STPWORD 	size = 69
+	ios::pword(int)                 
+
+STRCAT  	size = 57
+	_strcat                         
+
+STRCHR  	size = 54
+	_strchr                         
+
+STRCMP  	size = 47
+	_strcmp                         
+
+STRCOLL 	size = 16
+	_strcoll                        
+
+STRCPY  	size = 34
+	_strcpy                         
+
+STRCSPN 	size = 42
+	_strcspn                        
+
+STRDATE 	size = 205
+	__strdate                         __strtime
+
+STRDUP  	size = 50
+	_strdup                         
+
+STRERROR	size = 299
+	__strerror                        _strerror
+
+STRICMP 	size = 64
+	_stricmp                        
+
+STRLEN  	size = 26
+	_strlen                         
+
+STRLWR  	size = 32
+	_strlwr                         
+
+STRNCAT 	size = 68
+	_strncat                        
+
+STRNCMP 	size = 55
+	_strncmp                        
+
+STRNCPY 	size = 44
+	_strncpy                        
+
+STRNICMP	size = 67
+	_strnicmp                       
+
+STRNSET 	size = 42
+	_strnset                        
+
+STRPBRK 	size = 43
+	_strpbrk                        
+
+STRRCHR 	size = 45
+	_strrchr                        
+
+STRREV  	size = 48
+	_strrev                         
+
+STRSET  	size = 29
+	_strset                         
+
+STRSPN  	size = 47
+	_strspn                         
+
+STRSTR  	size = 96
+	_strstr                         
+
+STRTOK  	size = 126
+	_strtok                         
+
+STRTOL  	size = 255
+	_strtol                         
+
+STRTOUL 	size = 207
+	_strtoul                        
+
+STRUPR  	size = 32
+	_strupr                         
+
+STRXFRM 	size = 59
+	_strxfrm                        
+
+STSETF1 	size = 169
+	ios::setf(long)                 
+
+STSETF2 	size = 86
+	ios::setf(long,long)            
+
+STSETST 	size = 37
+	ios::setstate(int)              
+
+STSKIP  	size = 71
+	ios::skip(int)                  
+
+STSYNC  	size = 236
+	ios::sync_with_stdio()          
+
+STTIE   	size = 60
+	ios::tie(ostream near*)         
+
+STUNSET 	size = 68
+	ios::unsetf(long)               
+
+STUSIZE 	size = 91
+	ios::usersize(int)              
+
+STXALC  	size = 8
+	ios::xalloc()                   
+
+SWAB    	size = 31
+	_swab                           
+
+SYSTEM  	size = 276
+	_system                         
+
+TELL    	size = 22
+	_tell                           
+
+TEMPNAM 	size = 210
+	_tempnam                        
+
+TEXTMODE	size = 31
+	_textmode                       
+
+TIMECVT 	size = 753
+	_dostounix                        _unixtodos
+
+TMPFILE 	size = 57
+	__tmpnum                          _tmpfile
+
+TMPNAM  	size = 15
+	_tmpnam                         
+
+TOLOWER 	size = 44
+	_tolower                        
+
+TOUPPER 	size = 44
+	_toupper                        
+
+TZSET   	size = 651
+	__ISDST                           __monthDay
+	_daylight                         _timezone
+	_tzname                           _tzset
+
+UMASK   	size = 21
+	_umask                          
+
+UNGETC  	size = 72
+	__Nungetc                         _ungetc
+
+UNLINK  	size = 22
+	_unlink                         
+
+UTIME   	size = 640
+	_utime                          
+
+VAPP    	size = 214
+	__vector_apply_                 
+
+VAPPV   	size = 243
+	__vector_applyv_                
+
+VDEL    	size = 319
+	__vector_delete_                
+
+VDELF   	size = 386
+	_vector_delete_(void far*,unsigned int,unsigned long,unsigned int,...)
+
+VDELN   	size = 262
+	_vector_delete_(void near*,unsigned int,unsigned int,unsigned int,...)
+
+VFPRINTF	size = 21
+	_vfprintf                       
+
+VFSCANF 	size = 28
+	_vfscanf                        
+
+VIDINFO 	size = 65
+	_gettextinfo                    
+
+VNEW    	size = 283
+	__vector_new_                   
+
+VNEWF   	size = 467
+	_vector_new_(void far*,unsigned int,unsigned long,unsigned int,...)
+
+VNEWN   	size = 274
+	_vector_new_(void near*,unsigned int,unsigned int,unsigned int,...)
+
+VNEWV   	size = 315
+	__vector_vnew_                  
+
+VNEWVF  	size = 483
+	_vector_vnew_(void far*,unsigned int,unsigned long,unsigned int,...)
+
+VNEWVN  	size = 288
+	_vector_vnew_(void near*,unsigned int,unsigned int,unsigned int,...)
+
+VPRINTER	size = 1325
+	__VPRINTER                      
+
+VPRINTF 	size = 22
+	_vprintf                        
+
+VRAM    	size = 159
+	__VPTR                            __VRAM
+
+VSCANF  	size = 29
+	_vscanf                         
+
+WHEREXY 	size = 44
+	__wherexy                         _wherex
+	_wherey                         
+
+WILD    	size = 677
+	__wildargv                      
+
+WINDOW  	size = 97
+	_window                         
+
+WRITE   	size = 260
+	___write                        
+
+WRITEA  	size = 58
+	__write                         
+
+WRITEU  	size = 3
+	_write                          
+
+WSCROLL 	size = 2
+	__wscroll                       
+
+XCLOSE  	size = 24
+	__xclose                        
+
+XFCLOSE 	size = 38
+	__xfclose                       
+
+XFFLUSH 	size = 33
+	__xfflush                       
+
+ZAPCTLZ 	size = 163
+	__APPENDCTLZ                      __TRIMCTLZ
+
+_FSOPEN 	size = 31
+	__fsopen                        
+
+_STPCPY 	size = 37
+	__stpcpy                        

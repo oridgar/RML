@@ -42,9 +42,9 @@ More fixes
 
 Next release (file system):
 -------------
-1. compile file system into kernel and map it to kernel low level sector reading.
-2. put init and shell in a filesystem instead reading from sectors directly.
-3. load init and shell from the filesystem.
+1. compile file system into kernel and map it to kernel low level sector reading. -V
+2. put init and shell in a filesystem instead reading from sectors directly. -V
+3. load init and shell from the filesystem. - V
 
 Next release (scheduler):
 -------------
@@ -52,11 +52,11 @@ Next release (scheduler):
 2. how to program PIT (timer configurations)
 3. handler will be a part of the scheduler in assembly.
 4. a data structure to manage user spaces / applications
-5. before loading a program, register it to this data structure
+5. before loading a program, register it to this data stucture
 
 standard library
 ----------------
-1. implement the most used functions of C standard library
+1. implement the most used functions of C standard library -V
 
 Next release:
 -------------
@@ -64,5 +64,5 @@ Next release:
 
 IO
 --
-1. write assembly code to map between assembly low-level instructions to C language.
-1.1. includes cli,sti,in,out
+1. write assembly code to map between assembly low-level instructions to C language. - V
+1.1. includes cli,sti,in,out - V
