@@ -1,0 +1,28 @@
+#!/bin/bash
+
+
+apt install build-essential xserver-xorg-dev libxrandr-dev autoconf nasm gdb dosbox -y
+
+#download bochs source code
+wget https://netix.dl.sourceforge.net/project/bochs/bochs/2.6.9/bochs-2.6.9.tar.gz
+#extract source code
+tar zxfv bochs-2.6.9.tar.gz
+
+./configure --enable-gdb-stub --enable-cdrom --enable-sb16 --enable-a20-pin
+make
+cp bochs ../bochs/
+cp bios/BIOS-bochs-latest ../bochs/bios/
+cp bios/VGABIOS-lgpl-latest ../bochs/bios/
+
+
+cat << EOF > ../bochs/bochsrc
+gdbstub: enabled=1
+romimage: file=bios/BIOS-bochs-latest
+vgaromimage: file=bios/VGABIOS-lgpl-latest
+#ata0-slave: type=cdrom,path=<path to file",status=inserted
+boot:floppy
+sb16: enabled=1
+sound:waveoutdrv=dummy
+megs: 16
+#cpuid: x86_64=1
+

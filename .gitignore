@@ -10,3 +10,5 @@ test
 cygwin_vars.sh
 unattndc2.sh
 Debug
+*.o
+result.txt

@@ -1,8 +1,15 @@
-.MODEL tiny
-.CODE
-ORG 0h
+;.MODEL tiny
+;.CODE
+;ORG 0h
 
-global _farcall
+global farcall
+extern	getchar
+extern	putchar
+extern	dispatch
+extern	halt
+extern	reboot
+extern	startk
+extern  schedule
 
 buf_size EQU 288 ; in words, not bytes!
 
@@ -21,7 +28,7 @@ kernel: 	mov ax, cs ;initialize stack : SS=CS
 			mov bp,ax
 			mov ax, cs ; saving code segment
 			mov ds,ax ; copying code segment to data segment
-			jmp _startk
+			jmp startk
 			
 ;prep_p:	;------------
 			;SERVICE CODE
@@ -56,7 +63,7 @@ intr:
 
 			;DESTINATION OF STRING COPY
 			;offset of data in the local segment
-			mov  di,offset params ; destination of copy is params global variable in kernel
+			mov  di, params ; destination of copy is params global variable in kernel
 			
 			;----------------------
 			;SYSTEM CALL PARAMETERS
@@ -95,8 +102,8 @@ cpy:		lodsw ; copy next word from user space to AX : LODSW (DS:SI -> AX) and SI+
 
 			;switch stack
 			;increase 2 bytes (each address offset is 2 bytes)
-			inc [suserp]
-			inc [suserp]
+			inc word [suserp]
+			inc word [suserp]
 			mov bx,[suserp] ;backup stack pointer
 			mov [ssuser+bx], ss
 			;END OF USER STACK
@@ -109,13 +116,13 @@ cpy:		lodsw ; copy next word from user space to AX : LODSW (DS:SI -> AX) and SI+
 			mov  ax,si
 			sub  ax,buf_size*2 ;REWIND user buffer
 			push ax ;to use user parameters offset to return value
-			push [dsuser] ;to use user data segment to return value
+			push word [dsuser] ;to use user data segment to return value
 
 ;calling to C function
-disp:		mov  bx,offset params
+disp:		mov  bx, params
 			push bx
 			push dx ; parameter for dispatch function
-			call __dispatch
+			call dispatch
 			pop dx ; remove the parameter
 			pop bx ; bx is dummy
 			
@@ -126,7 +133,7 @@ disp:		mov  bx,offset params
 			pop es ; user space data segment to ES
 			pop di
 
-			mov si, offset params
+			mov si, params
 			
 			;-------------
 			;copy function
@@ -155,8 +162,8 @@ sysexit:	;HERE SHOULD BE THE CODE TO BRING BACK USER SPACE!
 			mov ss,[ssuser+bx]
 			mov sp,[spuser+bx]
 			;decrease 2 bytes (each address offset is 2 bytes)
-			dec [suserp]
-			dec [suserp]
+			dec word [suserp]
+			dec word [suserp]
 			;user data
 			mov ax,es
 			mov ds,ax
@@ -170,19 +177,19 @@ sched:
 			push ds
 			mov ax,cs
 			mov ds,ax
-			mov bx, offset _b_int8_offs
+			mov bx, b_int8_offs
 			mov ax, [bx]
-			mov jmpf_ofs, ax
-			mov bx, offset _b_int8_seg
+			mov [jmpf_ofs], ax
+			mov bx, b_int8_seg
 			mov ax,[bx]
-			mov jmpf_segm, ax
+			mov [jmpf_segm], ax
 
 			;user code
 			;mov ax,61
 			;push ax
 			;call __putchar
 			;pop ax
-			call _schedule
+			call schedule
 
 			pop ds
 			pop bx
@@ -202,7 +209,7 @@ sched:
 ;stack content: offset, segment, caller offset to the next instruction, caller base pointer
 			
 ;_farcall PROC
-_farcall:
+farcall:
 	;ARG in_ofs:WORD
 	;ARG in_segm:WORD
 	
@@ -235,11 +242,11 @@ _farcall:
 	;=====
 	
 	;offset for jumping
-	mov ax, word ptr [bp+4]
-	mov ofs, ax
+	mov ax, word [bp+4]
+	mov [ofs], ax
 	
-	mov ax, word ptr [bp+2] ;first parameter
-	mov segm, ax ; segment for jump far
+	mov ax, word [bp+2] ;first parameter
+	mov [segm], ax ; segment for jump far
 
 	mov ss,ax ; stack segment is the same as code segment for user app
 	mov sp, 0FFFEh ; user's top stack segment 
@@ -275,27 +282,20 @@ _farcall:
 	RET
 ;_farcall ENDP
 
-public _b_int8_seg
-public _b_int8_offs
+global b_int8_seg
+global b_int8_offs
 
+SECTION .data
 ;msg		db	13,10,'system call!',13,10,0
-params		db buf_size*2 DUP(0)
+params		times buf_size*2 db 0
 service		dw 0
 spbak		dw 0
 ssbak		dw 0
-spuser		dw 10 DUP(0)
-ssuser		dw 10 DUP(0)
+spuser		times 10 dw 0
+ssuser		times 10 dw 0
 suserp      dw 0
 dsuser		dw 0
-_b_int8_seg	dw ?
-_b_int8_offs	dw ?
+SECTION .bss
+b_int8_seg:	resb 2
+b_int8_offs:	resb 2
 
-extrn	__getchar:near
-extrn	__putchar:near
-extrn	__dispatch:near
-extrn	_halt:near
-extrn	_reboot:near
-extrn	_startk:near
-extrn   _schedule:near
-
-END start

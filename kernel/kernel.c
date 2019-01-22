@@ -20,33 +20,35 @@ void time();
 //-------------------------
 
 void halt() {
-	asm {
-		hlt
-	}
+	__asm__ (
+		"hlt"
+	);
 }
 
 void cli() {
-	asm {
-		cli
-	}
+	__asm__ (
+		"cli"
+	);
 }
 
 void sti() {
-	asm {
-		sti
-	}
+	asm (
+		"sti"
+	);
 }
 
 void outb(int port, char value) {
-	asm {
-		push ax
-		push dx
-		mov dx,[port]
-		mov al,[value]
-		out dx,al
-		pop dx
-		pop ax
-	}
+	asm (
+		"push ax\n\t"
+		"push dx\n\t"
+		"mov dx, %0\n\t"
+		"mov al, %1\n\t"
+		"out dx,al\n\t"
+		"pop dx\n\t"
+		"pop ax\n"
+		:
+		: "r" ((short)port), "r" (value)
+	);
 }
 
 //-----------------------------
@@ -83,7 +85,7 @@ void startk() {
 	}
 }
 
-void _dispatch(int service,SYSCALL_PARAM *params) {
+void dispatch(int service,SYSCALL_PARAM *params) {
 	int curr_pid;
 	int fd;
 	//temp
@@ -187,18 +189,23 @@ unsigned int load(char *name,int *pid,unsigned int *seg) {
 }
 
 void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive) {
-	asm {
-		mov  dl,[drive] //drive
-		mov	 ch,[cylinder] // cylinder/track 
-		mov  dh,[head] //head 0
-		mov  cl,[sector] 
-		mov  al,[num_sectors] //number of sectors to read
-		mov  bx,[segment]
-		mov  es,bx  //second 64K segment (pass by value)
-		mov  bx,[prog_offset] //load to prog_offset from segment
-		mov  ah,0x02 //Read Sectors From Drive service
-		int  13h
-	}
+	__asm__ (
+		//"mov  dl,%0\n\t" //drive
+		//"mov  ch,%1\n\t" // cylinder/track
+		//"mov  dh,%2\n\t" //head 0
+		//"mov  cl,%3\n\t"
+		//"mov  al,%4\n\t" //number of sectors to read
+		//"mov  bx,%5\n\t"
+
+		//"mov  es,bx"  //second 64K segment (pass by value)
+		//"mov  bx,%0" //load to prog_offset from segment"
+		//"mov  ah,0x02" //Read Sectors From Drive service
+		"int  0x13"
+		:
+		: "dl" (drive) //, "ch" (cylinder), "dh" (head), "cl" (sector), "al" (num_sectors), "bx" (segment)
+		  //,"r" (prog_offset)
+		: "dl" //, "ch", "dh", "cl", "al", "bx"
+	);
 }
 
 void uname() {
@@ -206,24 +213,24 @@ void uname() {
 }
 
 void set_ivt() {
-	asm {
+	__asm__ (
 			//first segment, where IVT is found
-			mov ax,0h
-			mov es,ax
+			"mov ax,0x0\n\t"
+			"mov es,ax\n\t"
 						
 			//offset where ISR is found (0h)
 			//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
 			//80h * 04h = 200h
 			//at the next two bytes (202h) resides the segment for the interupt handler
-			mov bx,200h
-			mov ax,0h
-			mov es:[bx],ax
+			"mov bx,0x200\n\t"
+			"mov ax,0x0\n\t"
+			"mov es:[bx],ax\n\t"
 			
 			//segment where ISR is found (1000h - second segment)
-			mov bx,202h
-			mov ax,1000h
-			mov es:[bx],ax
-	}
+			"mov bx,0x202\n\t"
+			"mov ax,0x1000\n\t"
+			"mov es:[bx],ax\n\t"
+	);
 	/*
 	ivt:		; first segment set at ES
 			mov ax,0h
@@ -303,30 +310,30 @@ void set_scheduler() {
 
 	//setting rml to be ISR for INT 08h
 
-	asm {
+	__asm__ (
 			//first segment, where IVT is found
-			push ax
-			push es
-			push bx
-			mov ax,0h
-			mov es,ax
+			"push ax\n\t"
+			"push es\n\t"
+			"push bx\n\t"
+			"mov ax,0x0\n\t"
+			"mov es,ax\n\t"
 
 			//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
 			//08h * 04h = 20h
-			mov bx,20h
+			"mov bx,0x20\n\t"
 			//offset where ISR is found (6h)
-			mov ax,5h
-			mov es:[bx],ax
+			"mov ax,0x5\n\t"
+			"mov es:[bx],ax\n\t"
 
 			//at the next two bytes (22h) resides the segment for the interupt handler
 			//segment where ISR is found (1000h - second segment)
-			mov bx,22h
-			mov ax,1000h
-			mov es:[bx],ax
-			pop bx
-			pop es
-			pop ax
-	}
+			"mov bx,0x22\n\t"
+			"mov ax,0x1000\n\t"
+			"mov es:[bx],ax\n\t"
+			"pop bx\n\t"
+			"pop es\n\t"
+			"pop ax\n\t"
+	);
 
 
 	//update
@@ -344,18 +351,18 @@ void PIC_sendEOI(unsigned char irq) {
 }
 
 void save_oldint8() {
-	unsigned int offs;
-	unsigned int segment;
+	unsigned short offs;
+	unsigned short segment;
 
-	asm {
+	__asm__ (
 
-		push ax
-		push es
-		push bx
+		"push ax\n\t"
+		"push es\n\t"
+		"push bx\n\t"
 
 		//first segment, where IVT is found
-		mov ax,0h
-		mov es,ax
+		"mov ax,0x0\n\t"
+		"mov es,ax\n\t"
 
 		//offset where ISR is found (20h)
 		//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
@@ -363,18 +370,19 @@ void save_oldint8() {
 		//at the next two bytes (22h) resides the segment for the interupt handler
 
 		// offset
-		mov bx,20h
-		mov ax,es:[bx]
-		mov [offs],ax
+		"mov bx,0x20\n\t"
+		"mov ax,es:[bx]\n\t"
+		"mov %0,ax\n\t"
 		//segment
-		add bx,2
-		mov ax,es:[bx]
-		mov [segment],ax
+		"add bx,2\n\t"
+		"mov ax,es:[bx]\n\t"
+		"mov %1,ax\n\t"
 
-		pop bx
-		pop es
-		pop ax
-	}
+		"pop bx\n\t"
+		"pop es\n\t"
+		"pop ax\n\t"
+		: "=r" (offs), "=r" (segment)
+	);
 
 	b_int8_offs = offs;
 	b_int8_seg = segment;

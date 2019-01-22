@@ -1,9 +1,8 @@
-.MODEL tiny
-.CODE
-;ORG 100h
-ORG 0h
+;org 0h
 
-start: 		
+extern	main
+
+_start: 		
 			;mov [userss],cs
 			;mov ss,[userss]
 			;mov sp,0FFFEh
@@ -36,8 +35,7 @@ start:
 ;			jmp  chr
 
 ;start init program
-init:	    call near ptr _main
-;return to kernel
+init:	    call main ;return to kernel
 						
 			pop di
 			pop si
@@ -51,7 +49,5 @@ init:	    call near ptr _main
 			;retf ; return far to the kernel segment
 			db 0cbh ; RETF code
 
-extrn	_main:near
 ;msg		db	'program entry point...',13,10,0
 userss  dw  0
-END start

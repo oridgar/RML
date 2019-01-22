@@ -1,5 +1,5 @@
-#include <linux\kernio.h>
-#include <linux\sched.h>
+#include <linux/kernio.h>
+#include <linux/sched.h>
 
 ProcessDesc processes[NUM_PROCESSES];
 int running_proc;

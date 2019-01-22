@@ -414,33 +414,33 @@ int mount(char * filename) {
 
 void load_to_memory(unsigned int segment,int prog_offset,char *buffer,int count) {
 	count = count /2;
-	asm {
-		push di
-		push ax
-		push es
-		push cx
+	__asm__ (
+		"push di\n\t"
+		"push ax\n\t"
+		"push es\n\t"
+		"push cx\n\t"
 
-		mov  si,[buffer]
+		"mov  si,[%0]\n\t"
 		//ds already configured...
-		mov  di,[prog_offset] // destination of copy is params global variable in kernel
-		mov	 es,[segment]
+		"mov  di,[%1]\n\t" // destination of copy is params global variable in kernel
+		"mov  es,[%2]\n\t"
 
 		//;-------------
 		//;copy function
 		//;-------------
-		mov cx,[count]
-		cld // direction is forward
-	}
-cpy:
-	asm {
-		lodsw // copy next word to AX : LODSW (DS:SI -> AX) and SI++
-		stosw // copy next word from AX : STOSW (AX -> ES:DI) and DI++
-		loop cpy
-		pop cx
-		pop es
-		pop ax
-		pop di
-	}
+		"mov cx,%3\n\t"
+		"cld\n" // direction is forward
+		"cpy:\n\t"
+		"lodsw\n\t" // copy next word to AX : LODSW (DS:SI -> AX) and SI++
+		"stosw\n\t" // copy next word from AX : STOSW (AX -> ES:DI) and DI++
+		"loop cpy\n\t"
+		"pop cx\n\t"
+		"pop es\n\t"
+		"pop ax\n\t"
+		"pop di\n\t"
+		:
+		: "r" (buffer), "r" (prog_offset), "r" (segment), "r" ((short)count)
+	);
 }
 
 //int getdents(unsigned int fd, linux_dirent *dirp, unsigned int count) {

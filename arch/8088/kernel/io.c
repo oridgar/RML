@@ -30,32 +30,35 @@ void dprintstr(char *string) {
 
 void dputchar(char in) {
 	char temp = in;
-	asm {
-		  mov ah,0Eh
-		  mov al,[temp]
-		  int 10h
-	}
+	
+	__asm__ (
+//		  ".intel_syntax;"
+		  "mov ah,0x0e\n\t"
+		  "mov al, %0\n\t"
+		  "int 0x10\n\t"
+//		  ".att_syntax"
+		  :
+		  : "r" (temp)
+		  : "ax"
+	);
+
 }
 
 
 char dgetchar() {
 	char temp;
-	
-	waitForKey:
-	asm {
-		mov ah,01h
-		int 16h
-		jnz gotKey
-		jmp waitForKey
-	}
-
-	gotKey:
-	asm {
-		mov ah,00h
-		int 16h
-		mov [temp],al
-	}
-	
+	__asm__ (
+		"waitForKey:\n\t"
+			"mov ah,0x1\n\t"
+			"int 0x16\n\t"
+			"jnz gotKey\n\t"
+			"jmp waitForKey\n"
+		"gotKey:\n\t"
+			"mov ah,0x0\n\t"
+			"int 0x16\n\t"
+			"mov %0,al"
+		: "=r" (temp)
+	);
 	return temp;
 }
 
@@ -63,7 +66,7 @@ char dgetchar() {
 
 
 void syscall(int service) {
-	asm {
+	__asm__ (
 		//not needed as code and stack are taken care
 		//push cs
 		//push ip
@@ -72,32 +75,34 @@ void syscall(int service) {
 		
 
 		//push bp already happen by c compiler		
-		pushf
-		push ds
-		push es
-		push ax
-		push cx
-		push di
+		"pushf\n\t"
+		"push ds\n\t"
+		"push es\n\t"
+		"push ax\n\t"
+		"push cx\n\t"
+		"push di\n\t"
 		
-		push bx
-		push dx
-		push si
+		"push bx\n\t"
+		"push dx\n\t"
+		"push si\n\t"
+
+		"mov bx, %0\n\t" //copying the value sitting in "service" address (pass by value)
+		"mov dx,bx\n\t" //copying the content of bx
+		"mov si, sysparam\n\t"
+		"int 0x80\n\t"
+		"pop si\n\t"
+		"pop dx\n\t"
+		"pop bx\n\t"
 		
-		mov bx,[service] //copying the value sitting in "service" address (pass by value)
-		mov dx,bx //copying the content of bx
-		mov si,offset sysparam;
-		int 80h
-		pop si
-		pop dx
-		pop bx
-		
-		pop di
-		pop cx
-		pop ax
-		pop es
-		pop ds
-		popf
-	}
+		"pop di\n\t"
+		"pop cx\n\t"
+		"pop ax\n\t"
+		"pop es\n\t"
+		"pop ds\n\t"
+		"popf\n\t"
+		:
+		: "r" ((short)service)
+	);
 }
 
 void call_int() {
