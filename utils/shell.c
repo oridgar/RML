@@ -3,11 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-void main() {
-	shell();
-	//return 0;
-}
-
 int shell() {
 	char *a = "# ";
 	char buf[50];
@@ -89,4 +84,9 @@ int shell() {
 		}
 	}
 	return 0;
+}
+
+void main() {
+	shell();
+	//return 0;
 }

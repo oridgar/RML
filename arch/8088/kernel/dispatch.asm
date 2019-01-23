@@ -1,6 +1,7 @@
 ;.MODEL tiny
 ;.CODE
 ;ORG 0h
+bits 16
 
 global farcall
 extern	getchar

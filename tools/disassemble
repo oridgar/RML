@@ -1,0 +1,2 @@
+#!/bin/bash
+objdump -M intel -mi386 -Maddr16,data16 -S -D $1

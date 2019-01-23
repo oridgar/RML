@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <linux/io.h>
 
 void main() {
 	char *str1 = "Entered to init...\r\n";

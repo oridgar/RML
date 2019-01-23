@@ -15,6 +15,7 @@ extern int b_int8_seg;
 extern int b_int8_offs;
 void time();
 
+
 //-------------------------
 //CPU INSTRUCTIONS WRAPPERS
 //-------------------------
@@ -65,7 +66,7 @@ void startk() {
     //------------
     //Code Section
     //------------
-	open("/dev/stdout", 0,0);
+	open("/dev/stdout", 0, 0);
 	printk("starting kernel...\r\n");
 //	printk("buffer size: ");
 //	printk(uitoa(SYSCALL_BUF_SIZE));

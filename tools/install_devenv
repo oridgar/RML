@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-apt install build-essential xserver-xorg-dev libxrandr-dev autoconf nasm gdb dosbox -y
+apt install build-essential xserver-xorg-dev libxrandr-dev autoconf nasm gdb dosbox mtools -y
 
 #download bochs source code
 wget https://netix.dl.sourceforge.net/project/bochs/bochs/2.6.9/bochs-2.6.9.tar.gz

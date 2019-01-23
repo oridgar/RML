@@ -1,4 +1,5 @@
 ;org 0h
+bits 16
 
 extern	main
 

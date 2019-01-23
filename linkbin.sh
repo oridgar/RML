@@ -13,8 +13,7 @@ nasm -f elf ../arch/8088/kernel/dispatch.asm -o dispatch.o
 #THIS IS NO LONGER NEEDED. WE DO NOT USE TURBO C
 #nasm -f elf ../arch/8088/tclib/runtime.asm -o runtime.asm >> result.txt 
 
-gcc_arguments="-fno-pie -masm=intel -m16 -march=i386 -O0 -nostdlib -ffreestanding -Wl,--nmagic -I../include -I../include/linux"
-
+gcc_arguments="-std=gnu99 -fno-pie -masm=intel -m16 -march=i386 -O0 -Wl,--nmagic -I../include -I../include/linux -ffreestanding -nostdlib"
 #creating object file from C code
 echo ////////////////////
 echo Compiling user space
@@ -46,7 +45,7 @@ gcc $gcc_arguments -g -c ../utils/ps.c
 #rem IF ERRORLEVEL 1 pause
 #tcc -Id:\include -mt -S d:\kernel\kernel.c d:\kernel\sched.c d:\mm\mm.c d:\fs\msdos\fs.c d:\kernel\bios.c d:\kernel\kernio.c
 #GCC/NASM
-gcc $gcc_arguments -g -c ../kernel/kernel.c 
+gcc $gcc_arguments -g -c ../kernel/kernel.c
 gcc $gcc_arguments -g -c ../kernel/sched.c 
 gcc $gcc_arguments -g -c ../mm/mm.c 
 gcc $gcc_arguments -g -c ../fs/msdos/fs.c 
@@ -94,6 +93,10 @@ ar r std.a string.o stdlib.o stdio.o
 #GCC/NASM
 ar r kern.a sched.o mm.o bios.o kernio.o fs.o
 
+linker_args="--script=../kernel.ld"
+objcopy_args="-O binary"
+#" --remove-section .eh_frame"
+#-m elf_i386
 echo //////////////
 echo linking kernel
 echo //////////////
@@ -105,46 +108,52 @@ echo //////////////
 #rem tlink /t /s dispatch.obj kernel.obj sched.obj mm.obj bios.obj kernio.obj fs.obj string.obj ctype.obj utils.obj,kernel.bin >> result.txt 
 #tlink /t /s dispatch.obj .\tc\minrt.lib kernel.obj kern.lib string.obj ctype.obj utils.obj,kernel.bin >> result.txt 
 #GCC/NASM
-ld -m elf_i386 --script=../kernel.ld dispatch.o kernel.o kern.a string.o ctype.o utils.o -o kernel.bin
+ld $linker_args dispatch.o kernel.o kern.a string.o ctype.o utils.o -o kernel
+objcopy $objcopy_args kernel kernel.bin
 #rem IF ERRORLEVEL 1 pause
 #
-#echo ////////////
+echo ////////////
 #echo linking init
-#echo ////////////
+echo ////////////
 #rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\init.obj,init.bin >> result.txt 
 #tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\init.obj,init.bin >> result.txt 
-ld -m elf_i386 --script=../kernel.ld head.o io.o std.a init.o -o init.bin
+ld $linker_args head.o io.o std.a init.o -o init
+objcopy $objcopy_args init init.bin
 #rem IF ERRORLEVEL 1 pause
 #
-#echo /////////////
+echo /////////////
 #echo linking shell
 #echo /////////////
 #rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\shell.obj,shell.bin >> result.txt 
 #tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\shell.obj,shell.bin >> result.txt 
-ld -m elf_i386 --script=../kernel.ld head.o io.o std.a shell.o -o shell.bin
+ld $linker_args head.o io.o std.a shell.o -o shell
+objcopy $objcopy_args shell shell.bin
 #
 #rem IF ERRORLEVEL 1 pause
 #
-#echo //////////
-#echo linking ls
-#echo //////////
+echo //////////
+echo linking ls
+echo //////////
 #rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ls.obj,ls.bin >> result.txt 
 #tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\ls.obj,ls.bin >> result.txt 
-ld -m elf_i386 --script=../kernel.ld head.o io.o std.a ls.o -o ls.bin
+ld $linker_args head.o io.o std.a ls.o -o ls
+objcopy $objcopy_args ls ls.bin
 #rem IF ERRORLEVEL 1 pause
 #
-#echo //////////
-#echo linking ps
-#echo //////////
+echo //////////
+echo linking ps
+echo //////////
 #rem tlink /t /s d:\obj\head.obj d:\obj\io.obj d:\obj\stdio.obj d:\obj\string.obj d:\obj\stdlib.obj d:\obj\ps.obj,ps.bin >> result.txt 
 #tlink /t /s d:\obj\head.obj .\tc\minrt.lib d:\obj\io.obj std.lib d:\obj\ps.obj,ps.bin >> result.txt 
-ld -m elf_i386 --script=../kernel.ld head.o io.o std.a ps.o -o ps.bin
+ld $linker_args head.o io.o std.a ps.o -o ps
+objcopy $objcopy_args ps ps.bin
 #
-#echo /////////////////
-#echo full compile demo
-#echo /////////////////
+echo /////////////////
+echo full compile demo
+echo /////////////////
 #tcc -Id:\include -mt -c d:\utils\demo.c
 gcc $gcc_arguments -g -c ../utils/demo.c
 #rem tlink /t /s head.obj io.obj stdio.obj string.obj stdlib.obj ctype.obj demo.obj,demo.bin >> result.txt
 #tlink /t /s head.obj .\tc\minrt.lib io.obj std.lib ctype.obj demo.obj,demo.bin >> result.txt
-ld -m elf_i386 --script=../kernel.ld head.o io.o std.a ctype.o demo.o -o demo.bin
+ld $linker_args head.o io.o std.a ctype.o demo.o -o demo
+objcopy $objcopy_args demo demo.bin

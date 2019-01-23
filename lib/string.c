@@ -25,7 +25,7 @@ char *strncpy(char *dst,char *src,unsigned int n) {
 	return dst;
 }
 
-int strcmp(char *src,char *dst) {
+int strcmp(const char *src, const char *dst) {
 	//change return values and shell code associated with it!
 	//int i=0;
 	//int ret=-1;
@@ -68,14 +68,14 @@ int  strncmp(char *src,char *dst,int n) {
 }
 
 
-size_t strlen(char *string) {
+size_t strlen(const char *string) {
 	size_t len =0;
 	while(string[len] != 0) {len++;}
 	return len;
 }
 
 
-void *memcpy(char *dst, char *src, int n) {
+void *memcpy(char *dst, const char *src, int n) {
 	int i;
 	for(i=0; i < n ; i++) {
 		dst[i] = src[i];

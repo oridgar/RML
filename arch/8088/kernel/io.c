@@ -137,7 +137,7 @@ void reboot() {
 //	//return dgetchar();
 //}
 
-int run_program(char *string) {
+int run_program(const char *string) {
 	memcpy(sysparam.param,string,SYSCALL_BUF_SIZE);
 	syscall(0x07);
 	return sysparam.param[0];
@@ -223,8 +223,8 @@ s = wait(&status) Old version of waitpid
 s = execve(name, argv, envp) Replace a process core image
 exit(status) Terminate process execution and return status
 size = brk(addr) Set the size of the data segment
-pid = getpid() Return the caller’s process id
-pid = getpgrp() Return the id of the caller’s process group
+pid = getpid() Return the callerï¿½s process id
+pid = getpgrp() Return the id of the callerï¿½s process group
 pid = setsid() Create a new session and return its proc. group id
 l = ptrace(req, pid, addr, data) Used for debugging
 s = sigaction(sig, &act, &oldact) Define action to take on signals
@@ -242,12 +242,12 @@ s = close(fd) Close an open file
 n = read(fd, buffer, nbytes) Read data from a file into a buffer
 n = write(fd, buffer, nbytes) Write data from a buffer into a file
 pos = lseek(fd, offset, whence) Move the file pointer
-s = stat(name, &buf) Get a file’s status information
-s = fstat(fd, &buf) Get a file’s status information
+s = stat(name, &buf) Get a fileï¿½s status information
+s = fstat(fd, &buf) Get a fileï¿½s status information
 fd = dup(fd) Allocate a new file descriptor for an open file
 s = pipe(&fd[0]) Create a pipe
 s = ioctl(fd, request, argp) Perform special operations on a file
-s = access(name, amode) Check a file’s accessibility
+s = access(name, amode) Check a fileï¿½s accessibility
 s = rename(old, new) Give a file a new name
 s = fcntl(fd, cmd, ...) File locking and other operations
 s = mkdir(name, mode) Create a new directory
@@ -260,16 +260,16 @@ s = umount(special) Unmount a file system
 s = sync() Flush all cached blocks to the disk
 s = chdir(dirname) Change the working directory
 s = chroot(dirname) Change the root directory
-s = chmod(name, mode) Change a file’s protection bits
-uid = getuid() Get the caller’s uid 
-gid = getgid() Get the caller’s gid
-s = setuid(uid) Set the caller’s uid
-s = setgid(gid) Set the caller’s gid
-s = chown(name, owner, group) Change a file’s owner and group
+s = chmod(name, mode) Change a fileï¿½s protection bits
+uid = getuid() Get the callerï¿½s uid 
+gid = getgid() Get the callerï¿½s gid
+s = setuid(uid) Set the callerï¿½s uid
+s = setgid(gid) Set the callerï¿½s gid
+s = chown(name, owner, group) Change a fileï¿½s owner and group
 oldmask = umask(complmode) Change the mode mask
 seconds = time(&seconds) Get the elapsed time since Jan. 1, 1970
 s = stime(tp) Set the elapsed time since Jan. 1, 1970
-s = utime(file, timep) Set a file’s "last access"time
+s = utime(file, timep) Set a fileï¿½s "last access"time
 s = times(buffer) Get the user and system times used so far )
 */
 
@@ -628,7 +628,7 @@ s = times(buffer) Get the user and system times used so far )
        socketpair(2)              2.0           See notes on socketcall(2)
        splice(2)                  2.6.17
        spu_create(2)              2.6.16        PowerPC only
-       spu_run(2)                 2.6.16        PowerPC only
+       spu_run(2)   syscall              2.6.16        PowerPC only
        ssetmask(2)                1.0
        stat(2)                    1.0
        stat64(2)                  2.4

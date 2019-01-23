@@ -1,0 +1,15 @@
+#!/bin/bash
+killall bochs
+pushd /mnt/d/rml-env/bochs
+./bochs -q > /dev/null 2>&1 &
+popd
+gdb -ex 'target remote localhost:1234'\
+    -ex 'set architecture i8086'\
+    -ex 'set disassembly-flavor intel'\
+    -ex 'display/i $pc + ($cs << 4)'\
+    -ex 'b *0x7c00'\
+    -ex 'b *0x2 if $cs == 0x1000'\
+    -ex 'b startk'\
+    -ex 'layout src'\
+    -ex 'layout reg'\
+    $1 
