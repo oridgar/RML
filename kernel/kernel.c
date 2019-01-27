@@ -21,34 +21,46 @@ void time();
 //-------------------------
 
 void halt() {
-	__asm__ (
-		"hlt"
+	__asm__ __volatile__ (
+	  "  hlt\n"
+	  :
+	  :
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 
 void cli() {
-	__asm__ (
-		"cli"
+	__asm__ __volatile__ (
+	  "  cli\n"
+	  :
+	  :
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 
 void sti() {
-	asm (
-		"sti"
+	__asm__ __volatile__ (
+	  "  sti\n"
+	  :
+	  :
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 
 void outb(int port, char value) {
-	asm (
-		"push ax\n\t"
-		"push dx\n\t"
-		"mov dx, %0\n\t"
-		"mov al, %1\n\t"
-		"out dx,al\n\t"
-		"pop dx\n\t"
-		"pop ax\n"
-		:
-		: "r" ((short)port), "r" (value)
+	__asm__ __volatile__ (
+
+	  "  push %%ax\n"
+	  "  push %%dx\n"
+	  "  mov  %0, %%dx\n"
+	  "  mov  %1, %%al\n"
+	  "  out  %%al, %%dx\n"
+	  "  pop  %%dx\n"
+	  "  pop  %%ax\n"
+
+	  :
+	  :"m"(port), "m"(value)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 
@@ -190,22 +202,20 @@ unsigned int load(char *name,int *pid,unsigned int *seg) {
 }
 
 void load_program(unsigned int segment,int prog_offset, char num_sectors,char cylinder,char sector, char head, char drive) {
-	__asm__ (
-		//"mov  dl,%0\n\t" //drive
-		//"mov  ch,%1\n\t" // cylinder/track
-		//"mov  dh,%2\n\t" //head 0
-		//"mov  cl,%3\n\t"
-		//"mov  al,%4\n\t" //number of sectors to read
-		//"mov  bx,%5\n\t"
-
-		//"mov  es,bx"  //second 64K segment (pass by value)
-		//"mov  bx,%0" //load to prog_offset from segment"
-		//"mov  ah,0x02" //Read Sectors From Drive service
-		"int  0x13"
-		:
-		: "dl" (drive) //, "ch" (cylinder), "dh" (head), "cl" (sector), "al" (num_sectors), "bx" (segment)
-		  //,"r" (prog_offset)
-		: "dl" //, "ch", "dh", "cl", "al", "bx"
+	__asm__ __volatile__ (
+	  "  mov  %0, %%dl\n"   //drive
+	  "  mov  %1, %%ch\n"   // cylinder/track
+	  "  mov  %2, %%dh\n"   //head 0
+	  "  mov  %3, %%cl\n"
+	  "  mov  %4, %%al\n"   //number of sectors to read
+	  "  mov  %5, %%bx\n"
+	  "  mov  %%bx, %%es\n"   //second 64K segment (pass by value)
+	  "  mov  %6, %%bx\n"   //load to prog_offset from segment
+	  "  mov  $0x2, %%ah\n" //Read Sectors From Drive service
+	  "  int  $0x13\n"
+	  :
+	  :"m"(drive), "m"(cylinder), "m"(head), "m"(sector), "m"(num_sectors), "m"(segment), "m"(prog_offset)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 
@@ -214,23 +224,29 @@ void uname() {
 }
 
 void set_ivt() {
-	__asm__ (
-			//first segment, where IVT is found
-			"mov ax,0x0\n\t"
-			"mov es,ax\n\t"
-						
-			//offset where ISR is found (0h)
-			//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
-			//80h * 04h = 200h
-			//at the next two bytes (202h) resides the segment for the interupt handler
-			"mov bx,0x200\n\t"
-			"mov ax,0x0\n\t"
-			"mov es:[bx],ax\n\t"
-			
-			//segment where ISR is found (1000h - second segment)
-			"mov bx,0x202\n\t"
-			"mov ax,0x1000\n\t"
-			"mov es:[bx],ax\n\t"
+	int segment = 0x1000;
+	int offset = 0x0;
+
+	__asm__ __volatile__ (
+	  //first segment, where IVT is found
+	  "  mov  $0x0, %%ax\n"
+	  "  mov  %%ax, %%es\n"
+
+	  //offset where ISR is found (0h)
+	  //each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
+	  //80h * 04h = 200h
+	  //at the next two bytes (202h) resides the segment for the interupt handler
+	  "  mov  $0x200, %%bx\n"
+	  "  mov  %0, %%ax\n"
+	  "  movw %%ax, %%es:(%%bx)\n"
+
+	  //segment where ISR is found (1000h - second segment)
+	  "  mov  $0x202, %%bx\n"
+	  "  mov  %1, %%ax\n"
+	  "  movw %%ax, %%es:(%%bx)\n"
+	  :
+	  :"m"(offset), "m"(segment)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 	/*
 	ivt:		; first segment set at ES
@@ -306,34 +322,40 @@ int run_program(char *name) {
 }
 
 void set_scheduler() {
+	int offset = 0x5;
+	int segment = 0x1000;
+
 	save_oldint8();
 
 
 	//setting rml to be ISR for INT 08h
 
-	__asm__ (
-			//first segment, where IVT is found
-			"push ax\n\t"
-			"push es\n\t"
-			"push bx\n\t"
-			"mov ax,0x0\n\t"
-			"mov es,ax\n\t"
+	__asm__ __volatile__ (
+	  //first segment, where IVT is found
+	  "  push %%ax\n"
+	  "  push %%es\n"
+	  "  push %%bx\n"
+	  "  mov  $0x0, %%ax\n"
+	  "  mov  %%ax, %%es\n"
 
-			//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
-			//08h * 04h = 20h
-			"mov bx,0x20\n\t"
-			//offset where ISR is found (6h)
-			"mov ax,0x5\n\t"
-			"mov es:[bx],ax\n\t"
+	  //each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
+	  //08h * 04h = 20h
+	  "  mov  $0x20, %%bx\n"
+	  //offset where ISR is found (6h)
+	  "  mov  %0, %%ax\n"
+	  "  movw %%ax, %%es:(%%bx)\n"
 
-			//at the next two bytes (22h) resides the segment for the interupt handler
-			//segment where ISR is found (1000h - second segment)
-			"mov bx,0x22\n\t"
-			"mov ax,0x1000\n\t"
-			"mov es:[bx],ax\n\t"
-			"pop bx\n\t"
-			"pop es\n\t"
-			"pop ax\n\t"
+	  //at the next two bytes (22h) resides the segment for the interupt handler
+	  //segment where ISR is found (1000h - second segment)
+	  "  mov  $0x22, %%bx\n"
+	  "  mov  %1, %%ax\n"
+	  "  movw %%ax, %%es:(%%bx)\n"
+	  "  pop  %%bx\n"
+	  "  pop  %%es\n"
+	  "  pop  %%ax\n"
+	  :
+	  :"m"(offset), "m"(segment)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 
 
@@ -355,34 +377,35 @@ void save_oldint8() {
 	unsigned short offs;
 	unsigned short segment;
 
-	__asm__ (
+	__asm__ __volatile__ (
+	  "  push %%ax\n"
+	  "  push %0\n"
+	  "  push %%bx\n"
 
-		"push ax\n\t"
-		"push es\n\t"
-		"push bx\n\t"
+	  //first segment, where IVT is found
+	  "  mov  $0x0, %%ax\n"
+	  "  mov  %%ax, %%es\n"
 
-		//first segment, where IVT is found
-		"mov ax,0x0\n\t"
-		"mov es,ax\n\t"
+	  //offset where ISR is found (20h)
+	  //each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
+	  //08h * 04h = 20h
+	  //at the next two bytes (22h) resides the segment for the interupt handler
 
-		//offset where ISR is found (20h)
-		//each entry in the IVT is 4 bytes. two bytes for offset and 2 bytes for segment
-		//08h * 04h = 20h
-		//at the next two bytes (22h) resides the segment for the interupt handler
+	  // offset
+	  "  mov  $0x20, %%bx\n"
+	  "  movw %%es:(%%bx), %%ax\n"
+	  "  mov  %%ax, %0\n"
+	  //segment
+	  "  add  $0x2, %%bx\n"
+	  "  movw %%es:(%%bx), %%ax\n"
+	  "  mov  %%ax, %1\n"
 
-		// offset
-		"mov bx,0x20\n\t"
-		"mov ax,es:[bx]\n\t"
-		"mov %0,ax\n\t"
-		//segment
-		"add bx,2\n\t"
-		"mov ax,es:[bx]\n\t"
-		"mov %1,ax\n\t"
-
-		"pop bx\n\t"
-		"pop es\n\t"
-		"pop ax\n\t"
-		: "=r" (offs), "=r" (segment)
+	  "  pop  %%bx\n"
+	  "  pop  %%es\n"
+	  "  pop  %%ax\n"
+	  :"=m"(offs), "=m"(segment)
+	  :
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 
 	b_int8_offs = offs;

@@ -30,78 +30,72 @@ void dprintstr(char *string) {
 
 void dputchar(char in) {
 	char temp = in;
-	
-	__asm__ (
-//		  ".intel_syntax;"
-		  "mov ah,0x0e\n\t"
-		  "mov al, %0\n\t"
-		  "int 0x10\n\t"
-//		  ".att_syntax"
-		  :
-		  : "r" (temp)
-		  : "ax"
+	__asm__ __volatile__ (
+	  "  mov  $0xe, %%ah\n"
+	  "  mov  %0, %%al\n"
+	  "  int  $0xa\n"
+	  :
+	  :"m"(temp)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
-
 }
 
 
 char dgetchar() {
 	char temp;
-	__asm__ (
-		"waitForKey:\n\t"
-			"mov ah,0x1\n\t"
-			"int 0x16\n\t"
-			"jnz gotKey\n\t"
-			"jmp waitForKey\n"
-		"gotKey:\n\t"
-			"mov ah,0x0\n\t"
-			"int 0x16\n\t"
-			"mov %0,al"
-		: "=r" (temp)
+
+	__asm__ __volatile__ (
+	  "  waitForKey:\n"
+	  "  mov  $0x1, %%ah\n"
+	  "  int  $0x16\n"
+	  "  jnz  gotKey\n"
+	  "  jmp  waitForKey\n"
+	  "  gotKey:\n"
+	  "  mov  $0x0, %%ah\n"
+	  "  int  $0x16\n"
+	  "  mov  %%al, %0\n"
+	  : "=m"(temp)
+	  :
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
+
 	return temp;
 }
-
 //END TEMP REGION - DIRECT CALLING SCREEN AND KEYBOARD FROM BIOS
 
 
 void syscall(int service) {
-	__asm__ (
-		//not needed as code and stack are taken care
-		//push cs
-		//push ip
-		//push ss
-		//push sp
-		
+	__asm__ __volatile__ (
 
-		//push bp already happen by c compiler		
-		"pushf\n\t"
-		"push ds\n\t"
-		"push es\n\t"
-		"push ax\n\t"
-		"push cx\n\t"
-		"push di\n\t"
-		
-		"push bx\n\t"
-		"push dx\n\t"
-		"push si\n\t"
+	  //push bp already happen by c compiler
+	  "  pushf\n"
+	  "  push     %%ds\n"
+	  "  push     %%es\n"
+	  "  push     %%ax\n"
+	  "  push     %%cx\n"
+	  "  push     %%di\n"
 
-		"mov bx, %0\n\t" //copying the value sitting in "service" address (pass by value)
-		"mov dx,bx\n\t" //copying the content of bx
-		"mov si, sysparam\n\t"
-		"int 0x80\n\t"
-		"pop si\n\t"
-		"pop dx\n\t"
-		"pop bx\n\t"
-		
-		"pop di\n\t"
-		"pop cx\n\t"
-		"pop ax\n\t"
-		"pop es\n\t"
-		"pop ds\n\t"
-		"popf\n\t"
-		:
-		: "r" ((short)service)
+	  "  push     %%bx\n"
+	  "  push     %%dx\n"
+	  "  push     %%si\n"
+
+	  "  mov      %0, %%bx\n"   //copying the value sitting in "service" address (pass by value)
+	  "  mov      %%bx, %%dx\n" //copying the content of bx
+	  "  lea      %1, %%si\n"
+	  "  int      $0x80\n"
+	  "  pop      %%si\n"
+	  "  pop      %%dx\n"
+	  "  pop      %%bx\n"
+
+	  "  pop      %%di\n"
+	  "  pop      %%cx\n"
+	  "  pop      %%ax\n"
+	  "  pop      %%es\n"
+	  "  pop      %%ds\n"
+	  "  popf\n"
+	  :
+	  :"m"(service), "m"(sysparam)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 

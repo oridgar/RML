@@ -414,32 +414,33 @@ int mount(char * filename) {
 
 void load_to_memory(unsigned int segment,int prog_offset,char *buffer,int count) {
 	count = count /2;
-	__asm__ (
-		"push di\n\t"
-		"push ax\n\t"
-		"push es\n\t"
-		"push cx\n\t"
+	__asm__ __volatile__ (
+	  "  push %%di\n"
+	  "  push %%ax\n"
+	  "  push %%es\n"
+	  "  push %%cx\n"
 
-		"mov  si,[%0]\n\t"
-		//ds already configured...
-		"mov  di,[%1]\n\t" // destination of copy is params global variable in kernel
-		"mov  es,[%2]\n\t"
+	  "  mov  %0, %%si\n"
+	  //ds already configured...
+	  "  mov  %1, %%di\n" // destination of copy is params global variable in kernel
+	  "  mov  %2, %%es\n"
 
-		//;-------------
-		//;copy function
-		//;-------------
-		"mov cx,%3\n\t"
-		"cld\n" // direction is forward
-		"cpy:\n\t"
-		"lodsw\n\t" // copy next word to AX : LODSW (DS:SI -> AX) and SI++
-		"stosw\n\t" // copy next word from AX : STOSW (AX -> ES:DI) and DI++
-		"loop cpy\n\t"
-		"pop cx\n\t"
-		"pop es\n\t"
-		"pop ax\n\t"
-		"pop di\n\t"
-		:
-		: "r" (buffer), "r" (prog_offset), "r" (segment), "r" ((short)count)
+	  //;-------------
+	  //;copy function
+	  //;-------------
+	  "  mov  %3, %%cx\n"
+	  "  cld\n"           // direction is forward
+	  "cpy:  \n"
+	  "    lodsw\n"         // copy next word to AX : LODSW (DS:SI -> AX) and SI++
+	  "    stosw\n"         // copy next word from AX : STOSW (AX -> ES:DI) and DI++
+	  "    loop     cpy\n"
+	  "    pop      %%cx\n"
+	  "    pop      %%es\n"
+	  "    pop      %%ax\n"
+	  "    pop      %%di\n"
+	  :
+	  :"m"(buffer), "m"(prog_offset), "m"(segment), "m"(count)
+	  :"memory", "esi", "edi", "eax", "ebx", "ecx", "edx"
 	);
 }
 

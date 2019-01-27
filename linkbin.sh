@@ -13,7 +13,8 @@ nasm -f elf ../arch/8088/kernel/dispatch.asm -o dispatch.o
 #THIS IS NO LONGER NEEDED. WE DO NOT USE TURBO C
 #nasm -f elf ../arch/8088/tclib/runtime.asm -o runtime.asm >> result.txt 
 
-gcc_arguments="-std=gnu99 -fno-pie -masm=intel -m16 -march=i386 -O0 -Wl,--nmagic -I../include -I../include/linux -ffreestanding -nostdlib"
+gcc_arguments="-std=gnu99 -fno-pie -m16 -march=i386 -O0 -Wl,--nmagic -I../include -I../include/linux -ffreestanding -nostdlib"
+#-masm=intel 
 #creating object file from C code
 echo ////////////////////
 echo Compiling user space
