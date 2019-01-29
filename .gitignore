@@ -12,3 +12,5 @@ unattndc2.sh
 Debug
 *.o
 result.txt
+*.img
+*.a

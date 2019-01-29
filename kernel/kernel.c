@@ -379,7 +379,7 @@ void save_oldint8() {
 
 	__asm__ __volatile__ (
 	  "  push %%ax\n"
-	  "  push %0\n"
+	  "  push %%es\n"
 	  "  push %%bx\n"
 
 	  //first segment, where IVT is found

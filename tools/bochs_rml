@@ -1,0 +1,7 @@
+#!/bin/bash
+bochs_path=/opt/rml/bochs
+
+killall bochs
+pushd ${bochs_path}
+./bochs -q 
+popd

@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <io.h>
+#include <linux/io.h>
 
 char *itoa(int i) {
 	static char  buf[5 + 2];
