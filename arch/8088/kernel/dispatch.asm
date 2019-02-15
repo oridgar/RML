@@ -243,10 +243,10 @@ farcall:
 	;=====
 	
 	;offset for jumping
-	mov ax, word [bp+4]
+	mov ax, word [bp+2]
 	mov [ofs], ax
 	
-	mov ax, word [bp+2] ;first parameter
+	mov ax, word [bp+4] ;first parameter
 	mov [segm], ax ; segment for jump far
 
 	mov ss,ax ; stack segment is the same as code segment for user app
