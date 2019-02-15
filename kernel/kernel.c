@@ -85,7 +85,7 @@ void startk() {
 //	printk("\r\n");
 	init_seg();
 	set_ivt();
-	set_scheduler();
+//	set_scheduler();
 	//sti();
 
 	mount("/dev/fdb");

@@ -8,7 +8,7 @@
 
 typedef enum {TYPE_VFAT,TYPE_DELETED,TYPE_NONE,TYPE_VOLLABEL,TYPE_FILE} entry_type;
 
-typedef struct {
+typedef struct __attribute__((__packed__)) {
     unsigned char jmp[3];
     char oem[8];
     unsigned short sector_size;
@@ -34,7 +34,7 @@ typedef struct {
     unsigned short boot_sector_signature;
 }  Fat16BootSector;
 
-typedef struct {
+typedef struct __attribute__((__packed__)) {
 	unsigned char filename[8];
     unsigned char ext[3];
     unsigned char attributes;
@@ -45,13 +45,13 @@ typedef struct {
     unsigned long   file_size;
 } Fat16Entry;
 
-typedef struct {
+typedef struct  __attribute__((__packed__)) {
 	unsigned int fat_section_start;
 	unsigned int  data_section_start;
 	unsigned int root_directory_start;
 } sectionPositions;
 
-typedef struct {
+typedef struct __attribute__((__packed__)) {
 	char read_only;
 	char hidden;
 	char system_file;

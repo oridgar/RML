@@ -143,10 +143,19 @@ int get_root_files(Fat16Entry *files) {
 
 
 	lseek(5,0,0,0);
+	printk("reading root directory\r\n");
+	printk("root directory entries:");
+	printk(uitoa(bs.root_dir_entries));
+	printk("\r\n");
 	for(i=0; i < bs.root_dir_entries;i++) {
+		printk("reading entry number ");
+		printk(uitoa(i));
+		printk("\r\n");
+		if (i == 223) {
+			printk("entry 223\r\n");
+		}
 		read(5,&files[i], sizeof(Fat16Entry),0);
 	}
-
 
 	/*
 	printk("reading root files. start pos: ");
